@@ -2,6 +2,10 @@
   "$schema": "./node_modules/nx/schemas/workspace-schema.json",
   "version": 2,
   "projects": {
+    "layouts": "libs/layouts",
+    "pages-detail": "libs/pages/detail",
+    "pages-home": "libs/pages/home",
+    "pages-login": "libs/pages/login",
     "task-reminder": "apps/task-reminder",
     "task-reminder-e2e": "apps/task-reminder-e2e"
   }
