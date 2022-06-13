@@ -1,0 +1,8 @@
+{
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json",
+  "version": 2,
+  "projects": {
+    "task-reminder": "apps/task-reminder",
+    "task-reminder-e2e": "apps/task-reminder-e2e"
+  }
+}
