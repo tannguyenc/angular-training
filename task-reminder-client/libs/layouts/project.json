@@ -1,0 +1,22 @@
+{
+  "projectType": "library",
+  "sourceRoot": "libs/layouts/src",
+  "prefix": "task-reminder-client",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/layouts"],
+      "options": {
+        "jestConfig": "libs/layouts/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["libs/layouts/**/*.ts", "libs/layouts/**/*.html"]
+      }
+    }
+  },
+  "tags": []
+}
