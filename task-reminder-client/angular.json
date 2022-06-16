@@ -6,6 +6,10 @@
     "pages-detail": "libs/pages/detail",
     "pages-home": "libs/pages/home",
     "pages-login": "libs/pages/login",
+    "services-task": "libs/services/task",
+    "services-user": "libs/services/user",
+    "states-task": "libs/states/task",
+    "states-user": "libs/states/user",
     "task-reminder": "apps/task-reminder",
     "task-reminder-e2e": "apps/task-reminder-e2e"
   }

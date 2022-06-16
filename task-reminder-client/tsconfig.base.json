@@ -18,7 +18,15 @@
       "@task-reminder-client/layouts": ["libs/layouts/src/index.ts"],
       "@task-reminder-client/pages/detail": ["libs/pages/detail/src/index.ts"],
       "@task-reminder-client/pages/home": ["libs/pages/home/src/index.ts"],
-      "@task-reminder-client/pages/login": ["libs/pages/login/src/index.ts"]
+      "@task-reminder-client/pages/login": ["libs/pages/login/src/index.ts"],
+      "@task-reminder-client/services/task": [
+        "libs/services/task/src/index.ts"
+      ],
+      "@task-reminder-client/services/user": [
+        "libs/services/user/src/index.ts"
+      ],
+      "@task-reminder-client/states/task": ["libs/states/task/src/index.ts"],
+      "@task-reminder-client/states/user": ["libs/states/user/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
