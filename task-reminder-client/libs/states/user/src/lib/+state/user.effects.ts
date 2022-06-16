@@ -14,14 +14,11 @@ export class UserEffects {
     this.actions$.pipe(
       ofType(UserActions.login),
       exhaustMap(({ email, password }) => this.userService.authenticate(email, password).pipe(
-        tap((resp) => {
-          // localStorage.setItem('token', resp.token);
+        tap(() => {
           this.router.navigate(['/home']);
         }),
         map(resp => UserActions.loginSuccess({ token: resp.token })),
-        catchError((error: HttpErrorResponse) => {
-          return of(UserActions.loginFailure({ error }))
-        })
+        catchError((error: HttpErrorResponse) => of(UserActions.loginFailure({ error })))
       ))
     )
   );
