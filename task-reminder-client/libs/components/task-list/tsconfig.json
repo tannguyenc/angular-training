@@ -17,14 +17,12 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "strictPropertyInitialization": false
+    "noFallthroughCasesInSwitch": true
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  },
+  }
 }

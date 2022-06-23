@@ -6,6 +6,5 @@
     "types": ["jest", "node"]
   },
   "files": ["src/test-setup.ts"],
-  "include": ["jest.config.ts", "**/*.test.ts", "**/*.spec.ts", "**/*.d.ts"],
-  "suppressImplicitAnyIndexErrors": true,
+  "include": ["jest.config.ts", "**/*.test.ts", "**/*.spec.ts", "**/*.d.ts"]
 }

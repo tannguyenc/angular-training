@@ -1,4 +1,4 @@
-<div class="h-full flex flex-col">
+<div class="h-full flex flex-col overflow-hidden">
   <!-- header -->
   <div class="header">
     <task-reminder-client-header>
@@ -7,23 +7,24 @@
   </div>
 
   <!--main content -->
-  <div class="main-content grid grid-cols-4 flex-1">
+  <div class="main-content grid grid-cols-4 flex-1 h-0">
     <!-- left menu -->
-    <div class="left-menu">
+    <div class="left-menu h-full">
       <task-reminder-client-left-menu>
 
       </task-reminder-client-left-menu>
     </div>
     <!-- content -->
-    <div class="content col-span-3">
-      <div class="grid grid-cols-12">
-        <div class="col-span-10">
+    <div class="content col-span-3 h-full overflow-hidden">
+      <div class="grid grid-cols-12 h-full">
+        <div class="col-span-10 h-full overflow-auto">
           <router-outlet></router-outlet>
         </div>
-        <div class="add-button mt-2">
+        <div class="add-button mt-2 h-full">
           <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-warning"></button>
         </div>
       </div>
     </div>
   </div>
 </div>
+<p-messages [value]="msgs"></p-messages>
