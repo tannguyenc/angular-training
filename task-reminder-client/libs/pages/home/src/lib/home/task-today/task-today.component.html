@@ -1,1 +1,14 @@
-<task-reminder-client-task-list [tasks]="(tasks$ | async) || []"></task-reminder-client-task-list>
+<!-- <task-reminder-client-task-list [tasks]="(tasks$ | async) || []"></task-reminder-client-task-list> -->
+<div class="task-list m-4 ml-0 mt-0 shadow-xl">
+  <div class="tasks-one-day" *ngFor="let task of (tasks$ | async) || []">
+    <div class="title flex m-3">
+      <p class="title-name text-orange-500 font-bold">
+        {{task.nameDay}}
+      </p>
+      <div class="date text-xs text-neutral-400 ml-1 mt-2">
+        {{task.day}}
+      </div>
+    </div>
+    <task-reminder-client-task-list (onUpdateDone)="onUpdateDone($event)" [tasks]="task.tasks"></task-reminder-client-task-list>
+  </div>
+</div>

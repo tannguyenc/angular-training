@@ -3,7 +3,6 @@ import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { createReducer, on, Action } from '@ngrx/store';
 
 import * as StateActions from './+state.actions';
-import { StateEntity } from './+state.models';
 
 export const _STATE_FEATURE_KEY = 'state';
 
@@ -11,8 +10,6 @@ export interface State extends EntityState<ITaskReminderDetail> {
   selectedId?: string | number; // which State record has been selected
   loaded: boolean; // has the State list been loaded
   error?: string | null; // last known error (if any)
-  allTaskResponse: ITaskResponse[];
-  tasks: ITaskReminderDetail[];
 }
 
 export interface StatePartialState {
@@ -25,8 +22,6 @@ export const stateAdapter: EntityAdapter<ITaskReminderDetail> =
 export const initialState: State = stateAdapter.getInitialState({
   // set initial required properties
   loaded: false,
-  allTaskResponse: [],
-  tasks: []
 });
 
 const stateReducer = createReducer(
@@ -39,14 +34,26 @@ const stateReducer = createReducer(
   on(StateActions.allTaskSuccess,
     (state, { tasks }) => stateAdapter.setAll(tasks, { ...state, loaded: true })),
   on(StateActions.updateDoneTaskSuccess,
-    (state, { task }) => ({
-      ...state,
-      loaded: true,
-      tasks: {
-        ...state.tasks,
-        task
-      }
-    }))
+    (state, { task }) => stateAdapter.updateOne({ id: task.id, changes: task }, state))
+  // on(StateActions.updateDoneTaskSuccess,
+  //   (state, { task }) => ({
+  //     ...state,
+  //     entities: {
+  //       ...state.entities,
+  //       task
+  //     },
+  //     loaded: true,
+  //   }))
+  // on(StateActions.updateDoneTaskSuccess, (state, { task }) => {
+  //   let tasks = state.entities;
+  //   tasks.push(task);
+  //   return {
+  //     ...state,
+  //     entities: tasks,
+  //     loaded: true,
+  //     error: null,
+  //   };
+  // })
 );
 
 export function reducer(state: State | undefined, action: Action) {

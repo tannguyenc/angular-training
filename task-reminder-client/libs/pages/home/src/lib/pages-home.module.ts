@@ -9,13 +9,16 @@ import { TaskTodayComponent } from './home/task-today/task-today.component';
 import { TaskOverdueComponent } from './home/task-overdue/task-overdue.component';
 import { ComponentsTaskListModule } from '@task-reminder-client/components/task-list';
 import { StatesTaskModule } from '@task-reminder-client/states/task';
+import {ConfirmDialogModule} from 'primeng/confirmdialog';
+import {ConfirmationService} from 'primeng/api';
 
 @NgModule({
   imports: [
     CommonModule,
     PageHomeRoutes,
     ComponentsTaskListModule,
-    StatesTaskModule
+    StatesTaskModule,
+    ConfirmDialogModule
   ],
   declarations: [
     HomeComponent,
@@ -25,5 +28,8 @@ import { StatesTaskModule } from '@task-reminder-client/states/task';
     TaskTodayComponent,
     TaskOverdueComponent,
   ],
+  providers: [
+    ConfirmationService
+  ]
 })
 export class PagesHomeModule {}

@@ -1,33 +1,13 @@
-<!-- <task-reminder-client-task-list (onUpdateDone)="onUpdateDone($event)" [tasks]="(tasks$ | async) || []"></task-reminder-client-task-list> -->
-<!-- <div class="border-solid border-b border-inherit" *ngFor="let task of ((tasks$ | async) || [])">
-  <div class="task-detail ml-3 text-gray-500" *ngIf="!task.done; else doneTask">
-    <div class="name-task font-bold mt-4">
-      {{task.name}}
+<div class="task-list m-4 ml-0 mt-0 shadow-xl">
+  <div class="tasks-one-day" *ngFor="let task of (tasks$ | async) || []">
+    <div class="title flex m-3">
+      <p class="title-name text-orange-500 font-bold">
+        {{task.nameDay}}
+      </p>
+      <div class="date text-xs text-neutral-400 ml-1 mt-2">
+        {{task.day}}
+      </div>
     </div>
-    <div class="des-task mb-2">
-      <p class="float-left">{{task.description}}</p>
-      <i class="pi pi-circle-fill  float-right text-xs mr-3 text-red-600" *ngIf="task.nameDay === 'Overdue'"></i>
-      <i class="pi pi-circle-fill  float-right text-xs mr-3 cursor-pointer text-blue-600"
-        *ngIf="task.nameDay === 'Today'" pTooltip="Mark as done" tooltipPosition="top"
-        (click)="isDone(task.id, true)"></i>
-      <i class="pi pi-circle-fill  float-right text-xs mr-3 text-green-600"
-        *ngIf="task.nameDay === 'Upcoming'"></i>
-      <div class="clear-both"></div>
-    </div>
+    <task-reminder-client-task-list (onUpdateDone)="onUpdateDone($event)" [tasks]="task.tasks"></task-reminder-client-task-list>
   </div>
-
-  <ng-template #doneTask>
-    <div class="task-detail ml-3 text-black">
-      <div class="name-task font-bold mt-4">
-        {{task.name}}
-      </div>
-      <div class="des-task mb-2">
-        <p class="float-left text-xs text-gray-400">{{task.description}}</p>
-        <i class="pi pi-circle-fill  float-right text-xs mr-3 text-gray-500" pTooltip="Mark as undone"
-          (click)="isDone(task.id, false)" tooltipPosition="top"></i>
-        <div class="clear-both"></div>
-      </div>
-    </div>
-
-  </ng-template>
-</div> -->
+</div>

@@ -35,13 +35,13 @@ namespace TaskReminderAPI.Controllers
                         break;
                 }
 
-                results = datas.Select(x=> new TaskReminderDetailModel
+                results = datas.OrderBy(x => x.DueDate).Select(x => new TaskReminderDetailModel
                 {
                     Created = x.Created,
                     Deleted = x.Deleted,
                     Description = x.Description,
                     Done = x.Done,
-                    DueDate = x.DueDate,
+                    DueDate = x.DueDate.Value.ToString("dd/MM/yyyy"),
                     Id = x.Id,
                     Name = x.Name,
                     NameDay = x.DueDate.Value.Date < timeNow ? "Overdue" : x.DueDate.Value.Date == timeNow ? "Today" : "Upcoming",
@@ -144,7 +144,7 @@ namespace TaskReminderAPI.Controllers
                 Deleted = taskReminder.Deleted,
                 Description = taskReminder.Description,
                 Done = taskReminder.Done,
-                DueDate = taskReminder.DueDate,
+                DueDate = taskReminder.DueDate.Value.ToString("dd/MM/yyyy"),
                 Id = taskReminder.Id,
                 Name = taskReminder.Name,
                 NameDay = taskReminder.DueDate.Value.Date < timeNow ? "Overdue" : taskReminder.DueDate.Value.Date == timeNow ? "Today" : "Upcoming",

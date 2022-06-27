@@ -21,7 +21,7 @@ namespace TaskReminderAPI.Models
         public string NameDay { get; set; }
         public string Description { get; set; }
         public DateTime Created { get; set; }
-        public DateTime? DueDate { get; set; }
+        public string DueDate { get; set; }
         public bool Done { get; set; }
         public bool Deleted { get; set; }
     }

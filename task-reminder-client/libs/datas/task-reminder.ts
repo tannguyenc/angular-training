@@ -16,7 +16,7 @@ export interface ITaskReminderDetail {
   nameDay: string;
   description: string;
   created: Date;
-  dueDate: Date;
+  dueDate: string;
   done: boolean;
   deleted: boolean;
   // [key: string]: any;
