@@ -15,7 +15,7 @@ export class UserEffects {
       ofType(UserActions.login),
       exhaustMap(({ email, password }) => this.userService.authenticate(email, password).pipe(
         tap(() => {
-          this.router.navigate(['/home']);
+          this.router.navigate(['/home/all']);
         }),
         map(resp => UserActions.loginSuccess({ token: resp.token })),
         catchError((error: HttpErrorResponse) => of(UserActions.loginFailure({ error })))

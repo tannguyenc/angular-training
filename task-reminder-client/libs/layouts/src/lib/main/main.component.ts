@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Message } from 'primeng/api';
 
 @Component({
   selector: 'task-reminder-client-main',
@@ -6,5 +7,6 @@ import { Component } from '@angular/core';
   styleUrls: ['./main.component.scss'],
 })
 export class MainComponent {
+  msgs: Message[] = [];
 
 }

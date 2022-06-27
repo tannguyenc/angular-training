@@ -1,26 +1,59 @@
+<div class="border-solid border-b border-inherit" *ngFor="let task of tasks">
+  <div class="task-detail ml-3 text-gray-500" *ngIf="!task.done; else doneTask">
+    <div class="name-task font-bold mt-4">
+      {{task.name}}
+    </div>
+    <div class="des-task mb-2">
+      <p class="float-left">{{task.description}}</p>
+      <i class="pi pi-circle-fill  float-right text-xs mr-3 text-red-600" *ngIf="task.nameDay === 'Overdue'"></i>
+      <i class="pi pi-circle-fill  float-right text-xs mr-3 cursor-pointer text-blue-600"
+        *ngIf="task.nameDay === 'Today'" pTooltip="Mark as done" tooltipPosition="top"
+        (click)="isDone(task.id, true)"></i>
+      <i class="pi pi-circle-fill  float-right text-xs mr-3 text-green-600"
+        *ngIf="task.nameDay === 'Upcoming'"></i>
+      <div class="clear-both"></div>
+    </div>
+  </div>
+
+  <ng-template #doneTask>
+    <div class="task-detail ml-3 text-black">
+      <div class="name-task font-bold mt-4">
+        {{task.name}}
+      </div>
+      <div class="des-task mb-2">
+        <p class="float-left text-xs text-gray-400">{{task.description}}</p>
+        <i class="pi pi-circle-fill  float-right text-xs mr-3 text-gray-500" pTooltip="Mark as undone"
+          (click)="isDone(task.id, false)" tooltipPosition="top"></i>
+        <div class="clear-both"></div>
+      </div>
+    </div>
+
+  </ng-template>
+</div>
+
 <!-- <div class="task-list m-4 ml-0 mt-0 shadow-xl">
-  <div class="tasks-one-day border-solid border border-inherit">
+  <div class="tasks-one-day">
     <div class="title flex m-3">
       <p class="title-name text-orange-500 font-bold">Today</p>
       <div class="date text-xs text-neutral-400 ml-1 mt-2">
         17/06/2022
       </div>
     </div>
-    <div class="task-detail ml-3 mr-3 border-solid border-inherit text-gray-500">
+    <div class="task-detail ml-3 border-solid border-b border-inherit text-gray-500">
       <div class="name-task font-bold mt-4">
         finish task today 01
       </div>
       <div class="des-task">
         <p class="float-left">abc desc</p>
-        <i class="pi pi-circle-fill text-black float-right text-xs"></i>
+        <i class="pi pi-circle-fill text-black float-right text-xs mr-3"></i>
         <div class="clear-both"></div>
       </div>
     </div>
-    <div class="task-detail border-solid border-t border-inherit text-gray-500">
-      <div class="name-task ml-3 font-bold mt-4">
+    <div class="task-detail ml-3 border-solid border-b border-inherit text-gray-500">
+      <div class="name-task font-bold mt-4">
         finish task today 02
       </div>
-      <div class="des-task ml-3">
+      <div class="des-task">
         abc desc
       </div>
       <div class="isdone">
@@ -64,12 +97,7 @@
         abc desc
       </div>
       <div class="isdone">
-
       </div>
     </div>
   </div>
 </div> -->
-<router-outlet></router-outlet>
-<p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"
-  acceptButtonStyleClass="bg-emerald-600 border-none" rejectButtonStyleClass="bg-red-600 border-none">
-</p-confirmDialog>

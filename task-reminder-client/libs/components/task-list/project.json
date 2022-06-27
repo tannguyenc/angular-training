@@ -1,0 +1,25 @@
+{
+  "projectType": "library",
+  "sourceRoot": "libs/components/task-list/src",
+  "prefix": "task-reminder-client",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/components/task-list"],
+      "options": {
+        "jestConfig": "libs/components/task-list/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/components/task-list/**/*.ts",
+          "libs/components/task-list/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

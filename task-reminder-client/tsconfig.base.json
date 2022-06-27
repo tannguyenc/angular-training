@@ -15,6 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@task-reminder-client/components/task-list": [
+        "libs/components/task-list/src/index.ts"
+      ],
       "@task-reminder-client/layouts": ["libs/layouts/src/index.ts"],
       "@task-reminder-client/pages/detail": ["libs/pages/detail/src/index.ts"],
       "@task-reminder-client/pages/home": ["libs/pages/home/src/index.ts"],

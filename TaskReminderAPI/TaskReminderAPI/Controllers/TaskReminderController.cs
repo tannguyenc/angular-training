@@ -15,8 +15,75 @@ namespace TaskReminderAPI.Controllers
         public TaskReminderController(TaskReminderDbContext context) => _context = context;
 
         [HttpGet]
-        public async Task<IEnumerable<TaskReminder>> Get()
-            => await _context.TaskReminders.Where(x => !x.Deleted).ToListAsync();
+        public async Task<List<TaskReminderDetailModel>> Get([FromQuery] TaskReminderStatus request)
+        {
+            var results = new List<TaskReminderDetailModel>();
+            var datas = await _context.TaskReminders.Where(x => !x.Deleted && x.DueDate.HasValue).ToListAsync();
+            if (datas.Any())
+            {
+                var timeNow = DateTime.Now.Date;
+                switch (request)
+                {
+                    case TaskReminderStatus.All:
+                        datas = datas.Where(x => x.DueDate.Value.Date >= DateTime.Now.Date).ToList();
+                        break;
+                    case TaskReminderStatus.Today:
+                        datas = datas.Where(x => x.DueDate.Value.Date == DateTime.Now.Date).ToList();
+                        break;
+                    case TaskReminderStatus.Overdue:
+                        datas = datas.Where(x => x.DueDate.Value.Date < DateTime.Now.Date).ToList();
+                        break;
+                }
+
+                results = datas.OrderBy(x => x.DueDate).Select(x => new TaskReminderDetailModel
+                {
+                    Created = x.Created,
+                    Deleted = x.Deleted,
+                    Description = x.Description,
+                    Done = x.Done,
+                    DueDate = x.DueDate.Value.ToString("dd/MM/yyyy"),
+                    Id = x.Id,
+                    Name = x.Name,
+                    NameDay = x.DueDate.Value.Date < timeNow ? "Overdue" : x.DueDate.Value.Date == timeNow ? "Today" : "Upcoming",
+                }).ToList();
+            }
+
+            return results;
+            //if (datas.Any())
+            //{
+            //    var timeNow = DateTime.Now.Date;
+            //    switch (request)
+            //    {
+            //        case TaskReminderStatus.All:
+            //            datas = datas.Where(x => x.DueDate.Value.Date >= DateTime.Now.Date).ToList();
+            //            break;
+            //        case TaskReminderStatus.Today:
+            //            datas = datas.Where(x => x.DueDate.Value.Date == DateTime.Now.Date).ToList();
+            //            break;
+            //        case TaskReminderStatus.Overdue:
+            //            datas = datas.Where(x => x.DueDate.Value.Date < DateTime.Now.Date).ToList();
+            //            break;
+            //    }
+
+            //    results = datas.GroupBy(x => x.DueDate.Value.Date).Select(x => new TaskReminderModel
+            //    {
+            //        Day = x.Key,
+            //        NameDay = x.Key < timeNow ? "Overdue" : x.Key == timeNow ? "Today" : "Upcoming",
+            //        Tasks = x.Select(y => new TaskReminderDetailModel
+            //        {
+            //            Id = y.Id,
+            //            Created = y.Created,
+            //            Deleted = y.Deleted,
+            //            Description = y.Description,
+            //            Done = y.Done,
+            //            DueDate = y.DueDate,
+            //            Name = y.Name,
+            //        }).ToList()
+            //    }).ToList();
+            //}
+
+            return results;
+        }
 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(TaskReminder), StatusCodes.Status200OK)]
@@ -57,6 +124,31 @@ namespace TaskReminderAPI.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpPut("{id}/done")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UpdateDoneStatus(int id, [FromQuery] bool isDone)
+        {
+            var taskReminder = await _context.TaskReminders.FirstOrDefaultAsync(x => x.Id == id && !x.Deleted);
+            if (taskReminder == null) return NotFound();
+
+            taskReminder.Done = isDone;
+            _context.TaskReminders.Update(taskReminder);
+            await _context.SaveChangesAsync();
+            var timeNow = DateTime.Now.Date;
+            return Ok(new TaskReminderDetailModel
+            {
+                Created = taskReminder.Created,
+                Deleted = taskReminder.Deleted,
+                Description = taskReminder.Description,
+                Done = taskReminder.Done,
+                DueDate = taskReminder.DueDate.Value.ToString("dd/MM/yyyy"),
+                Id = taskReminder.Id,
+                Name = taskReminder.Name,
+                NameDay = taskReminder.DueDate.Value.Date < timeNow ? "Overdue" : taskReminder.DueDate.Value.Date == timeNow ? "Today" : "Upcoming",
+            });
         }
 
         [HttpDelete("{id}")]

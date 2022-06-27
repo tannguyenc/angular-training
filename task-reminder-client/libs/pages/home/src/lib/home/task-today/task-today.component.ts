@@ -1,16 +1,16 @@
+import { IUpdateDone, TaskReminderStatus } from './../../../../../../datas/task-reminder';
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { ITaskResponse, IUpdateDone, TaskReminderStatus, ITaskReminderDetail } from './../../../../../../datas/task-reminder';
 import * as StateSelectors from '@task-reminder-client/states/task';
 import * as StateActions from '@task-reminder-client/states/task';
 import { map } from 'rxjs';
 
 @Component({
-  selector: 'task-reminder-client-tasks',
-  templateUrl: './tasks.component.html',
-  styleUrls: ['./tasks.component.scss'],
+  selector: 'task-reminder-client-task-today',
+  templateUrl: './task-today.component.html',
+  styleUrls: ['./task-today.component.scss'],
 })
-export class TasksComponent implements OnInit {
+export class TaskTodayComponent implements OnInit {
 
   tasks$ = this.store.select(StateSelectors.getAllState).pipe(
     map(tasks => {
@@ -34,7 +34,7 @@ export class TasksComponent implements OnInit {
   constructor(private store: Store) { }
 
   ngOnInit(): void {
-    this.store.dispatch(StateActions.allTask({ request: TaskReminderStatus.All }));
+    this.store.dispatch(StateActions.allTask({ request: TaskReminderStatus.Today }));
   }
 
   onUpdateDone(doneTask: IUpdateDone) {

@@ -8,9 +8,10 @@ import {AvatarModule} from 'primeng/avatar';
 import {AvatarGroupModule} from 'primeng/avatargroup';
 import {MenuModule} from 'primeng/menu';
 import {ButtonModule} from 'primeng/button';
+import { MessagesModule } from 'primeng/messages';
 
 @NgModule({
-  imports: [CommonModule, LayoutRoutes, AvatarModule, AvatarGroupModule, MenuModule, ButtonModule],
+  imports: [CommonModule, LayoutRoutes, AvatarModule, AvatarGroupModule, MenuModule, ButtonModule, MessagesModule],
   declarations: [MainComponent, HeaderComponent, LeftMenuComponent],
   exports: [MainComponent],
 })
