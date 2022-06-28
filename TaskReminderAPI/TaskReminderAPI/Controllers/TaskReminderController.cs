@@ -41,7 +41,7 @@ namespace TaskReminderAPI.Controllers
                     Deleted = x.Deleted,
                     Description = x.Description,
                     Done = x.Done,
-                    DueDate = x.DueDate.Value.ToString("dd/MM/yyyy"),
+                    DueDate = x.DueDate.Value,
                     Id = x.Id,
                     Name = x.Name,
                     NameDay = x.DueDate.Value.Date < timeNow ? "Overdue" : x.DueDate.Value.Date == timeNow ? "Today" : "Upcoming",
@@ -105,25 +105,66 @@ namespace TaskReminderAPI.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> Create(TaskReminder taskReminder)
+        public async Task<IActionResult> Create(AddTaskReminderRequest task)
         {
+            var taskReminder = new TaskReminder
+            {
+                Created = DateTime.Now,
+                Deleted = false,
+                Description = task.Description,
+                Done = false,
+                DueDate = task.DueDate,
+                Name = task.Name,
+            };
+
             await _context.TaskReminders.AddAsync(taskReminder);
             await _context.SaveChangesAsync();
+            var timeNow = DateTime.Now.Date;
 
-            return CreatedAtAction(nameof(GetById), new { id = taskReminder.Id }, taskReminder);
+            return Ok(new TaskReminderDetailModel
+            {
+                Created = taskReminder.Created,
+                Deleted = taskReminder.Deleted,
+                Description = taskReminder.Description,
+                Done = taskReminder.Done,
+                DueDate = taskReminder.DueDate.Value,
+                Id = taskReminder.Id,
+                Name = taskReminder.Name,
+                NameDay = taskReminder.DueDate.Value.Date < timeNow ? "Overdue" : taskReminder.DueDate.Value.Date == timeNow ? "Today" : "Upcoming",
+            });
+
+            //return CreatedAtAction(nameof(GetById), new { id = taskReminder.Id }, taskReminder);
         }
 
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update(int id, TaskReminder taskReminder)
+        public async Task<IActionResult> Update(int id, UpdateTaskReminderRequest task)
         {
-            if (id != taskReminder.Id) return BadRequest();
+            if (id != task.Id) return BadRequest();
 
-            _context.Entry(taskReminder).State = EntityState.Modified;
+            var taskReminder = await _context.TaskReminders.FindAsync(id);
+            if (taskReminder == null) return NotFound();
+            taskReminder.Name = task.Name;
+            taskReminder.Description = task.Description;
+            taskReminder.DueDate = task.DueDate;
+
+            _context.TaskReminders.Update(taskReminder);
             await _context.SaveChangesAsync();
+            var timeNow = DateTime.Now.Date;
 
-            return NoContent();
+            return Ok(new TaskReminderDetailModel
+            {
+                Created = taskReminder.Created,
+                Deleted = taskReminder.Deleted,
+                Description = taskReminder.Description,
+                Done = taskReminder.Done,
+                DueDate = taskReminder.DueDate.Value,
+                Id = taskReminder.Id,
+                Name = taskReminder.Name,
+                NameDay = taskReminder.DueDate.Value.Date < timeNow ? "Overdue" : taskReminder.DueDate.Value.Date == timeNow ? "Today" : "Upcoming",
+            });
+            //return Ok(taskReminder);
         }
 
         [HttpPut("{id}/done")]
@@ -144,7 +185,7 @@ namespace TaskReminderAPI.Controllers
                 Deleted = taskReminder.Deleted,
                 Description = taskReminder.Description,
                 Done = taskReminder.Done,
-                DueDate = taskReminder.DueDate.Value.ToString("dd/MM/yyyy"),
+                DueDate = taskReminder.DueDate.Value,
                 Id = taskReminder.Id,
                 Name = taskReminder.Name,
                 NameDay = taskReminder.DueDate.Value.Date < timeNow ? "Overdue" : taskReminder.DueDate.Value.Date == timeNow ? "Today" : "Upcoming",

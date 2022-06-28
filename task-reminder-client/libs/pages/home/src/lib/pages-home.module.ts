@@ -11,6 +11,16 @@ import { ComponentsTaskListModule } from '@task-reminder-client/components/task-
 import { StatesTaskModule } from '@task-reminder-client/states/task';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {ConfirmationService} from 'primeng/api';
+import {InputTextModule} from 'primeng/inputtext';
+import {CalendarModule} from 'primeng/calendar';
+import { FormsModule, ReactiveFormsModule  } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import {InputTextareaModule} from 'primeng/inputtextarea';
+import { MessageService } from 'primeng/api';
+import {MessagesModule} from 'primeng/messages';
+import {MessageModule} from 'primeng/message';
+import {ToastModule} from 'primeng/toast';
+import { DatePipe } from '@angular/common';
 
 @NgModule({
   imports: [
@@ -18,7 +28,16 @@ import {ConfirmationService} from 'primeng/api';
     PageHomeRoutes,
     ComponentsTaskListModule,
     StatesTaskModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    InputTextModule,
+    CalendarModule,
+    FormsModule,
+    HttpClientModule,
+    InputTextareaModule,
+    MessagesModule,
+    MessageModule,
+    ToastModule,
+    ReactiveFormsModule
   ],
   declarations: [
     HomeComponent,
@@ -29,7 +48,9 @@ import {ConfirmationService} from 'primeng/api';
     TaskOverdueComponent,
   ],
   providers: [
-    ConfirmationService
+    ConfirmationService,
+    MessageService,
+    DatePipe
   ]
 })
 export class PagesHomeModule {}

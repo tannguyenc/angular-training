@@ -30,30 +30,16 @@ const stateReducer = createReducer(
   on(StateActions.loadStateFailure,
     StateActions.allTaskFailure,
     StateActions.updateDoneTaskFailure,
+    StateActions.AddTaskFailure,
+    StateActions.UpdateTaskFailure,
     (state, { error }) => ({ ...state, error, loaded: true })),
   on(StateActions.allTaskSuccess,
     (state, { tasks }) => stateAdapter.setAll(tasks, { ...state, loaded: true })),
   on(StateActions.updateDoneTaskSuccess,
-    (state, { task }) => stateAdapter.updateOne({ id: task.id, changes: task }, state))
-  // on(StateActions.updateDoneTaskSuccess,
-  //   (state, { task }) => ({
-  //     ...state,
-  //     entities: {
-  //       ...state.entities,
-  //       task
-  //     },
-  //     loaded: true,
-  //   }))
-  // on(StateActions.updateDoneTaskSuccess, (state, { task }) => {
-  //   let tasks = state.entities;
-  //   tasks.push(task);
-  //   return {
-  //     ...state,
-  //     entities: tasks,
-  //     loaded: true,
-  //     error: null,
-  //   };
-  // })
+    StateActions.UpdateTaskSuccess,
+    (state, { task }) => stateAdapter.updateOne({ id: task.id, changes: task }, { ...state, loaded: true })),
+  on(StateActions.AddTaskSuccess,
+    (state, { task }) => stateAdapter.addOne(task, { ...state, loaded: true })),
 );
 
 export function reducer(state: State | undefined, action: Action) {

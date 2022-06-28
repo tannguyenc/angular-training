@@ -1,6 +1,8 @@
 import { IUpdateDone, ITaskReminderDetail } from './../../../../../datas/task-reminder';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { AddOrUpdateTaskComponent } from 'libs/pages/home/src/lib/home/add-or-update-task/add-or-update-task.component';
 
 @Component({
   selector: 'task-reminder-client-task-list',
@@ -23,7 +25,9 @@ export class TaskListComponent {
 
   @Output() onUpdateDone: EventEmitter<IUpdateDone> = new EventEmitter();
 
-  constructor(private confirmationService: ConfirmationService) { }
+  ref: DynamicDialogRef | undefined;
+
+  constructor(private confirmationService: ConfirmationService, private dialogService: DialogService) { }
 
   // ngOnInit(): void {
   // }
@@ -41,6 +45,16 @@ export class TaskListComponent {
 
         this.onUpdateDone.emit(doneTask);
       }
+    });
+  }
+
+  openTaskDetail(task: ITaskReminderDetail) {
+    this.ref = this.dialogService.open(AddOrUpdateTaskComponent, {
+      data: task,
+      header: 'Update Task Reminder',
+      width: '50%',
+      contentStyle: { "max-height": "500px", "overflow": "auto" },
+      baseZIndex: 10000
     });
   }
 }

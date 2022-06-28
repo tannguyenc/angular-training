@@ -1,8 +1,5 @@
-import { ITaskResponse } from './../../../../../datas/task-reminder';
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { _STATE_FEATURE_KEY, State, stateAdapter } from './+state.reducer';
-import * as lodash from 'lodash';
-import { from, groupBy, reduce } from 'rxjs';
 
 // Lookup the 'State' feature state managed by NgRx
 export const getStateState = createFeatureSelector<State>(_STATE_FEATURE_KEY);

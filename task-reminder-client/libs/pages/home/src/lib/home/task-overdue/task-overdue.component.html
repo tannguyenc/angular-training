@@ -6,7 +6,7 @@
         {{task.nameDay}}
       </p>
       <div class="date text-xs text-neutral-400 ml-1 mt-2">
-        {{task.day}}
+        {{task.day | date:'longDate'}}
       </div>
     </div>
     <task-reminder-client-task-list (onUpdateDone)="onUpdateDone($event)" [tasks]="task.tasks"></task-reminder-client-task-list>

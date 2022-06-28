@@ -4,6 +4,7 @@ import { Store } from '@ngrx/store';
 import * as StateSelectors from '@task-reminder-client/states/task';
 import * as StateActions from '@task-reminder-client/states/task';
 import { map } from 'rxjs';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'task-reminder-client-task-today',
@@ -16,10 +17,13 @@ export class TaskTodayComponent implements OnInit {
     map(tasks => {
 
       const groupByDay = tasks.reduce((r, a) => {
-            r[a.dueDate] = r[a.dueDate] || [];
-            r[a.dueDate].push(a);
-            return r;
-        }, Object.create([]));
+        let duaDate = this.datepipe.transform(a.dueDate, 'dd-MM-yyyy');
+        if (duaDate === null)
+          duaDate = '';
+        r[duaDate] = r[duaDate] || [];
+        r[duaDate].push(a);
+        return r;
+      }, Object.create([]));
 
       const arrGroupByDay =  Object.keys(groupByDay).map(key => ({
         tasks: groupByDay[key],
@@ -31,7 +35,8 @@ export class TaskTodayComponent implements OnInit {
     })
   )
 
-  constructor(private store: Store) { }
+  constructor(private store: Store,
+    private datepipe: DatePipe) { }
 
   ngOnInit(): void {
     this.store.dispatch(StateActions.allTask({ request: TaskReminderStatus.Today }));

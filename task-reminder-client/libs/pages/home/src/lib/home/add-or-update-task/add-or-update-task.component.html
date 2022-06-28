@@ -1,1 +1,27 @@
-<p>add-or-update-task works!</p>
+<form class="needs-validation" [formGroup]="taskForm">
+  <div class="field">
+    <label for="name" class="block">Name</label>
+    <input id="name" type="text" aria-describedby="name-help" formControlName="name" required
+      class="p-inputtext-sm w-full" pInputText />
+    <div class="invalid-feedback text-left" *ngIf="f['name'].invalid && (f['name'].dirty || f['name'].touched)">
+      <small *ngIf="f['name'].errors && f['name'].errors['required']" id="name-help" class="p-error block">Name is
+        required.</small>
+    </div>
+  </div>
+  <div class="field">
+    <label for="description" class="block">Description</label>
+    <textarea id="nadescriptionme" aria-describedby="description-help" formControlName="description"
+      class="p-inputtext-sm w-full" pInputTextarea></textarea>
+  </div>
+  <div class="field p-col-12 p-md-4">
+    <label class="block" for="duaDate">Due Date</label>
+    <p-calendar inputId="duaDate" formControlName="dueDate" [minDate]="minimumDate" [showTime]="true"
+      [showSeconds]="true" aria-describedby="duaDate-help" [showIcon]="true" appendTo="body">
+    </p-calendar>
+  </div>
+  <div class="float-right mt-4">
+    <button pButton class="mr-2 bg-green-600 border-none" type="button" label="Cancel" (click)="cancelAddTask()"></button>
+    <button pButton class="bg-green-600 border-none" type="submit" label="Ok" [disabled]="!taskForm.valid"
+      (click)="onSubmit()"></button>
+  </div>
+</form>
