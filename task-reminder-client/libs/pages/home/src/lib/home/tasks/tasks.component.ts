@@ -16,17 +16,13 @@ export class TasksComponent implements OnInit {
   tasks$ = this.store.select(StateSelectors.getAllState).pipe(
     map(tasks => {
       const groupByDay = tasks.reduce((r, a) => {
-        let duaDate = this.datepipe.transform(a.dueDate.getTime() - a.dueDate.getTimezoneOffset() * 60 * 1000, 'dd-MM-yyyy');
-        if (duaDate === null)
-          duaDate = '';
-        r[duaDate] = r[duaDate] || [];
-        r[duaDate].push(a);
+        r[a.nameDay] = r[a.nameDay] || [];
+        r[a.nameDay].push(a);
         return r;
       }, Object.create([]));
 
       const arrGroupByDay = Object.keys(groupByDay).map(key => ({
         tasks: groupByDay[key],
-        day: groupByDay[key][0]['dueDate'],
         nameDay: groupByDay[key][0]['nameDay']
       }));
 

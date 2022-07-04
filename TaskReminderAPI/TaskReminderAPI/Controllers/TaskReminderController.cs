@@ -113,7 +113,7 @@ namespace TaskReminderAPI.Controllers
                 Deleted = false,
                 Description = task.Description,
                 Done = false,
-                DueDate = task.DueDate,
+                DueDate = task.DueDate.ToLocalTime(),
                 Name = task.Name,
             };
 
@@ -147,7 +147,7 @@ namespace TaskReminderAPI.Controllers
             if (taskReminder == null) return NotFound();
             taskReminder.Name = task.Name;
             taskReminder.Description = task.Description;
-            taskReminder.DueDate = task.DueDate;
+            taskReminder.DueDate = task.DueDate.ToLocalTime();
 
             _context.TaskReminders.Update(taskReminder);
             await _context.SaveChangesAsync();

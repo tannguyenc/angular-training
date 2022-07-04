@@ -16,7 +16,7 @@ export class TaskListComponent {
   // @Input() tasks: ITaskResponse[] = [];
   @Input()
   set tasks(value: ITaskReminderDetail[] | []) {
-    this._task = value;
+    this._task = value.sort((a, b) => { return a.dueDate.getTime() - b.dueDate.getTime(); });
   }
 
   get tasks(): ITaskReminderDetail[] | [] {

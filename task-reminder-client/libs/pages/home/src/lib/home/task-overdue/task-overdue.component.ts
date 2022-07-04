@@ -17,11 +17,8 @@ export class TaskOverdueComponent implements OnInit {
     map(tasks => {
 
       const groupByDay = tasks.reduce((r, a) => {
-        let duaDate = this.datepipe.transform(a.dueDate, 'dd-MM-yyyy');
-        if (duaDate === null)
-          duaDate = '';
-        r[duaDate] = r[duaDate] || [];
-        r[duaDate].push(a);
+        r['nameDay'] = r['nameDay'] || [];
+        r['nameDay'].push(a);
         return r;
       }, Object.create([]));
 

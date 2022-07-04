@@ -1,31 +1,33 @@
 <div class="border-solid border-b border-inherit" *ngFor="let task of tasks">
   <div class="task-detail ml-3 text-gray-500" *ngIf="!task.done; else doneTask">
-    <div class="name-task font-bold mt-4">
-      <p class="cursor-pointer" (click)="openTaskDetail(task)">{{task.name}}</p>
+    <div class="mt-4 mr-4 flex justify-between">
+      <p class="name-task font-bold cursor-pointer" (click)="openTaskDetail(task)">{{task.name}}</p>
+      <p class="date text-xs text-neutral-400 ml-1 mt-2">{{task.dueDate | date:'short'}}</p>
+
     </div>
-    <div class="des-task mb-2">
+    <div class="des-task mb-2 mr-4">
       <p class="float-left">{{task.description}}</p>
       <i class="pi pi-circle-fill  float-right text-xs mr-3 text-red-600" *ngIf="task.nameDay === 'Overdue'"></i>
       <i class="pi pi-circle-fill  float-right text-xs mr-3 cursor-pointer text-blue-600"
         *ngIf="task.nameDay === 'Today'" pTooltip="Mark as done" tooltipPosition="top"
         (click)="isDone(task.id, true)"></i>
-      <i class="pi pi-circle-fill  float-right text-xs mr-3 text-green-600"
-        *ngIf="task.nameDay === 'Upcoming'"></i>
+      <i class="pi pi-circle-fill  float-right text-xs mr-3 text-green-600" *ngIf="task.nameDay === 'Upcoming'"></i>
       <div class="clear-both"></div>
     </div>
   </div>
 
   <ng-template #doneTask>
     <div class="task-detail ml-3 text-black">
-      <div class="name-task font-bold mt-4">
-        <p class="cursor-pointer" (click)="openTaskDetail(task)">{{task.name}}</p>
+      <div class="name-task mt-4 mr-4 flex justify-between">
+        <p class="font-bold cursor-pointer" (click)="openTaskDetail(task)">{{task.name}}</p>
+        <p class="date text-xs text-neutral-400 ml-1 mt-2">{{task.dueDate | date:'short'}}</p>
       </div>
-      <div class="des-task mb-2">
+      <div class="des-task mb-2 mr-4">
         <p class="float-left text-xs text-gray-400">{{task.description}}</p>
-        <i *ngIf="task.nameDay === 'Today'" class="pi pi-circle-fill cursor-pointer float-right text-xs mr-3 text-gray-500"
-        pTooltip="Mark as undone"
+        <i *ngIf="task.nameDay === 'Today'"
+          class="pi pi-circle-fill cursor-pointer float-right text-xs mr-3 text-gray-500" pTooltip="Mark as undone"
           (click)="isDone(task.id, false)" tooltipPosition="top"></i>
-          <i *ngIf="task.nameDay !== 'Today'" class="pi pi-circle-fill  float-right text-xs mr-3 text-gray-500"></i>
+        <i *ngIf="task.nameDay !== 'Today'" class="pi pi-circle-fill  float-right text-xs mr-3 text-gray-500"></i>
         <div class="clear-both"></div>
       </div>
     </div>

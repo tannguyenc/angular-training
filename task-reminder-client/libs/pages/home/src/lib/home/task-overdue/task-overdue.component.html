@@ -5,9 +5,9 @@
       <p class="title-name text-orange-500 font-bold">
         {{task.nameDay}}
       </p>
-      <div class="date text-xs text-neutral-400 ml-1 mt-2">
+      <!-- <div class="date text-xs text-neutral-400 ml-1 mt-2">
         {{task.day | date:'longDate'}}
-      </div>
+      </div> -->
     </div>
     <task-reminder-client-task-list (onUpdateDone)="onUpdateDone($event)" [tasks]="task.tasks"></task-reminder-client-task-list>
   </div>
