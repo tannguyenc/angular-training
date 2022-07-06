@@ -1,6 +1,6 @@
 <form class="needs-validation" [formGroup]="taskForm" (ngSubmit)="onSubmit()">
   <div class="field">
-    <label for="name" class="block">Name</label>
+    <label for="name" class="required block">Name</label>
     <input id="name" type="text" aria-describedby="name-help" formControlName="name" required
       class="p-inputtext-sm px w-full" pInputText />
     <div class="invalid-feedback text-left" *ngIf="f['name'].invalid && (f['name'].dirty || f['name'].touched)">
@@ -8,22 +8,22 @@
         required.</small>
     </div>
   </div>
-  <div class="field">
-    <label for="description" class="block">Description</label>
-    <textarea id="nadescriptionme" aria-describedby="description-help" formControlName="description"
-      class="p-inputtext-sm w-full" pInputTextarea></textarea>
-  </div>
-  <div class="field p-col-12 p-md-4 grid grid-cols-3 gap-4">
+  <div class="field p-col-12 p-md-4 grid grid-cols-3 gap-4 mt-1">
     <div class="col-span-2">
-      <label class="block" for="duaDate">Due Date</label>
+      <label class="required block" for="duaDate">Due Date</label>
       <p-calendar inputId="duaDate" formControlName="dueDate" [minDate]="minimumDate"
         aria-describedby="duaDate-help" [showIcon]="true" appendTo="body">
       </p-calendar>
     </div>
     <div>
-      <label class="block" for="duaTime">Due Time</label>
-      <p-calendar inputId="duaTime" formControlName="duaTime" [timeOnly]="true"></p-calendar>
+      <label class="required block" for="dueTime">Due Time</label>
+      <p-calendar inputId="dueTime" formControlName="dueTime" [timeOnly]="true"></p-calendar>
     </div>
+  </div>
+  <div class="field mt-1">
+    <label for="description" class="block">Description</label>
+    <textarea id="nadescriptionme" aria-describedby="description-help" formControlName="description"
+      class="p-inputtext-sm w-full" pInputTextarea></textarea>
   </div>
   <div class="float-right mt-4">
     <button pButton class="mr-2 p-button-sm

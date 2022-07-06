@@ -33,9 +33,15 @@ export class TaskListComponent {
   // }
 
   isDone(id: number, isDone: boolean) {
+    let message = 'Are you sure that you want to proceed?';
+    let header = 'Confirmation';
+    if (isDone) {
+      message = 'Are you sure that you want to proceed?';
+      header = 'Confirmation';
+    }
     this.confirmationService.confirm({
-      message: 'Are you sure that you want to proceed?',
-      header: 'Confirmation',
+      message: message,
+      header: header,
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         const doneTask = {
@@ -49,10 +55,14 @@ export class TaskListComponent {
   }
 
   openTaskDetail(task: ITaskReminderDetail) {
+    const taskDetail = {
+      ...task,
+      dueTime: task.dueDate
+    };
     this.ref = this.dialogService.open(AddOrUpdateTaskComponent, {
-      data: task,
+      data: taskDetail,
       header: 'Update Task Reminder',
-      width: '50%',
+      width: '40%',
       contentStyle: { "max-height": "500px", "overflow": "auto" },
       baseZIndex: 10000
     });

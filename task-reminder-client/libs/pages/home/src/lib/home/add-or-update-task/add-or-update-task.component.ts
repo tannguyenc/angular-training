@@ -26,7 +26,7 @@ export class AddOrUpdateTaskComponent implements OnInit {
       name: ['', Validators.required],
       description: [''],
       dueDate: ['', Validators.required],
-      dueTime: ['', Validators.required]
+      dueTime: [new Date(), Validators.required]
     });
   }
 
@@ -50,11 +50,24 @@ export class AddOrUpdateTaskComponent implements OnInit {
     if (this.taskForm.invalid) {
       return;
     }
+    const dueDate = this.taskForm.controls['dueDate'].value;
+    const dueTime = this.taskForm.controls['dueTime'].value;
+
+    const dueDateValue = new Date(dueDate);
+    const dueTimeValue = new Date(dueTime);
+
+    dueDateValue.setHours(dueTimeValue.getHours());
+    dueDateValue.setMinutes(dueTimeValue.getMinutes());
+
+    const form = {
+      ...this.taskForm.value,
+      dueDate: dueDateValue
+    };
 
     if (this.taskForm.value?.id > 0) {
-      this.store.dispatch(StateActions.UpdateTask({ task: this.taskForm.value }));
+      this.store.dispatch(StateActions.UpdateTask({ task: form }));
     } else {
-      this.store.dispatch(StateActions.AddTask({ task: this.taskForm.value }));
+      this.store.dispatch(StateActions.AddTask({ task: form }));
     }
     this.ref.close();
   }
