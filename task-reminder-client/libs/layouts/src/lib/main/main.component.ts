@@ -20,7 +20,7 @@ export class MainComponent implements OnDestroy {
   addTaskReminder() {
     this.ref = this.dialogService.open(AddOrUpdateTaskComponent, {
       header: 'Add Task Reminder',
-      width: '50%',
+      width: '30%',
       contentStyle: { "max-height": "500px", "overflow": "auto" },
       baseZIndex: 10000
     });

@@ -14,6 +14,7 @@ import { MessageService } from 'primeng/api';
 import {MessageModule} from 'primeng/message';
 import {ToastModule} from 'primeng/toast';
 import { FormsModule, ReactiveFormsModule  } from '@angular/forms';
+import {ScrollPanelModule} from 'primeng/scrollpanel';
 
 @NgModule({
   imports: [
@@ -28,7 +29,8 @@ import { FormsModule, ReactiveFormsModule  } from '@angular/forms';
     MessageModule,
     ToastModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ScrollPanelModule
   ],
   declarations: [MainComponent, HeaderComponent, LeftMenuComponent],
   exports: [MainComponent],

@@ -7,21 +7,34 @@ import * as UserSelectors from '../+state/user.selectors';
 @Injectable({ providedIn: 'root' })
 export class AuthGuardService implements CanActivate {
 
-  token$ = this.store.select(UserSelectors.getToken);
+  tokenStore$ = this.store.select(UserSelectors.getToken);
+  token$ = localStorage.getItem("token");
 
   constructor(
-        private router: Router,
-        private store : Store
-    ) { }
+    private router: Router,
+    private store: Store
+  ) { }
 
-    canActivate(): Observable<boolean> {
-      return this.token$.pipe(
+  canActivate(): Observable<boolean> {
+    if (this.token$ === null || !this.token$) {
+      return this.tokenStore$.pipe(
         map(token => token !== ''),
         tap((hasToken) => {
-          if(!hasToken) {
+          if (!hasToken) {
             this.router.navigate(['/login']);
           }
         })
       );
     }
+    return of(true);
+  }
+
+  // canActivate(): boolean {
+  //   console.log(this.token$);
+  //   if (this.token$ === null || !this.token$) {
+  //     this.router.navigate(['/login']);
+  //     return false;
+  //   }
+  //   return true;
+  // }
 }

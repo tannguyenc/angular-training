@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { LoginComponent } from './login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StatesUserModule } from '@task-reminder-client/states/user';
+import { MessageService } from 'primeng/api';
+import {ToastModule} from 'primeng/toast';
 
 @NgModule({
   imports: [
@@ -11,11 +13,13 @@ import { StatesUserModule } from '@task-reminder-client/states/user';
     FormsModule,
     ReactiveFormsModule,
     PageLoginRoutes,
-    StatesUserModule
+    StatesUserModule,
+    ToastModule
   ],
   declarations: [LoginComponent],
   exports: [
     LoginComponent
-  ]
+  ],
+  providers: [MessageService,]
 })
 export class PagesLoginModule {}

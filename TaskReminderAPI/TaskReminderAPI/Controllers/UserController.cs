@@ -22,11 +22,11 @@ namespace TaskReminderAPI.Controllers
         }
 
         [HttpPost("authorize")]
-        public async Task<AuthenticateResponse> Authenticate([FromBody] AuthenticateRequest model)
+        public async Task<IActionResult> Authenticate([FromBody] AuthenticateRequest model)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == model.Email && !x.Deleted);
             if (user is null)
-                throw new DataException("Email is incorrect");
+                return BadRequest("Email is incorrect");
 
             var hashedPassword = new PasswordHasher<object?>().HashPassword(null, model.Password);
 
@@ -34,16 +34,17 @@ namespace TaskReminderAPI.Controllers
             switch (passwordVerificationResult)
             {
                 case PasswordVerificationResult.Failed:
-                    throw new DataException("Password incorrect.");
+                    return BadRequest("Password incorrect.");
 
                 case PasswordVerificationResult.Success:
-                    return new AuthenticateResponse(user, "123456789");
+                    //return Ok(user, "123456789");
+                    return Ok(new AuthenticateResponse(user, $"{DateTime.Now:ddMMyyyy}12345"));
 
                 case PasswordVerificationResult.SuccessRehashNeeded:
-                    throw new DataException("Password ok but should be rehashed and updated.");
+                    return BadRequest("Password ok but should be rehashed and updated.");
             }
 
-            return new AuthenticateResponse(user, "123456789");
+            return Ok();
         }
 
         [HttpGet]

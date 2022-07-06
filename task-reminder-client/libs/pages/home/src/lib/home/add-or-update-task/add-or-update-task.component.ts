@@ -25,7 +25,8 @@ export class AddOrUpdateTaskComponent implements OnInit {
       id: [0, Validators.required],
       name: ['', Validators.required],
       description: [''],
-      dueDate: ['', Validators.required]
+      dueDate: ['', Validators.required],
+      dueTime: ['', Validators.required]
     });
   }
 

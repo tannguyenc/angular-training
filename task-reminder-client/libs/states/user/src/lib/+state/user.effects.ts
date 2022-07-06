@@ -6,6 +6,7 @@ import { catchError, exhaustMap, map, tap, of } from 'rxjs';
 import * as UserActions from './user.actions';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { MessageService } from 'primeng/api';
 
 @Injectable()
 export class UserEffects {
@@ -14,16 +15,21 @@ export class UserEffects {
     this.actions$.pipe(
       ofType(UserActions.login),
       exhaustMap(({ email, password }) => this.userService.authenticate(email, password).pipe(
-        tap(() => {
-          this.router.navigate(['/home/all']);
+        tap((resp) => {
+          localStorage.setItem('token', resp.token);
+          this.router.navigate(['home']);
         }),
         map(resp => UserActions.loginSuccess({ token: resp.token })),
-        catchError((error: HttpErrorResponse) => of(UserActions.loginFailure({ error })))
+        catchError((error: HttpErrorResponse) => {
+          this.messageService.add({ severity: 'error', summary: 'Login failed', detail: error.error });
+          return of(UserActions.loginFailure({ error }))
+        })
       ))
     )
   );
 
   constructor(private readonly actions$: Actions,
     private userService: UserService,
-    private router: Router,) { }
+    private router: Router,
+    private messageService: MessageService) { }
 }
