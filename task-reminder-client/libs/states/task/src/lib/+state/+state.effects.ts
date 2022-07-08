@@ -2,7 +2,6 @@ import { MessageService } from 'primeng/api';
 import { catchError, exhaustMap, map, of, tap } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
-import { fetch } from '@nrwl/angular';
 import { TaskService } from '@task-reminder-client/services/task';
 
 import * as StateActions from './+state.actions';
@@ -73,18 +72,6 @@ export class StateEffects {
       ))
     )
   );
-
-  // getListtask$ = createEffect(() =>
-  // this.actions$.pipe(
-  //   ofType(StateActions.allTask),
-  //   exhaustMap(({status}) => this.taskService.getListTask(status).pipe(
-  //     map
-  //   )
-
-  //   )
-  // )
-
-  // );
 
   constructor(private readonly actions$: Actions,
     private taskService: TaskService,

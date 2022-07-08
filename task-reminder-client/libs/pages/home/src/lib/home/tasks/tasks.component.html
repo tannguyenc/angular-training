@@ -1,13 +1,10 @@
 <div class="task-list ml-0 mt-0 shadow-xl">
-  <div class="tasks-one-day" *ngFor="let task of (tasks$ | async) || []">
-    <div class="title flex m-3">
-      <p class="title-name text-regal-blue font-bold">
-        {{task.nameDay}}
-      </p>
-      <!-- <div class="date text-xs text-neutral-400 ml-1 mt-2">
-        {{task.day | date:'longDate'}}
-      </div> -->
+  <p-accordion>
+    <div class="tasks-one-day" *ngFor="let task of (tasks$ | async) || []">
+      <p-accordionTab header="{{task.nameDay}}" [selected]="true">
+        <task-reminder-client-task-list (onUpdateDone)="onUpdateDone($event)" [tasks]="task.tasks">
+        </task-reminder-client-task-list>
+      </p-accordionTab>
     </div>
-    <task-reminder-client-task-list (onUpdateDone)="onUpdateDone($event)" [tasks]="task.tasks"></task-reminder-client-task-list>
-  </div>
+  </p-accordion>
 </div>

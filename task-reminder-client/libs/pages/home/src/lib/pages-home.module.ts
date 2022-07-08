@@ -21,6 +21,7 @@ import {MessagesModule} from 'primeng/messages';
 import {MessageModule} from 'primeng/message';
 import {ToastModule} from 'primeng/toast';
 import { DatePipe } from '@angular/common';
+import {AccordionModule} from 'primeng/accordion';
 
 @NgModule({
   imports: [
@@ -37,7 +38,8 @@ import { DatePipe } from '@angular/common';
     MessagesModule,
     MessageModule,
     ToastModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    AccordionModule
   ],
   declarations: [
     HomeComponent,

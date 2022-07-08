@@ -8,6 +8,17 @@ if (environment.production) {
   enableProdMode();
 }
 
-platformBrowserDynamic()
+export function getAPI() {
+  // if (environment.production) {
+  //   return '/';
+  // }
+  return environment.api;
+}
+
+const providers = [
+  { provide: 'BASE_API', useFactory: getAPI, deps: [] },
+];
+
+platformBrowserDynamic(providers)
   .bootstrapModule(AppModule)
   .catch((err) => console.error(err));

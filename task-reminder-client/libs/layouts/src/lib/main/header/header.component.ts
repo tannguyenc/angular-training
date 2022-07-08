@@ -1,5 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import * as StateSelectors from '@task-reminder-client/states/task';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'task-reminder-client-header',
@@ -7,7 +10,14 @@ import { Router } from '@angular/router';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit {
-  constructor(private router: Router) { }
+
+  activeTask$ = this.store.select(StateSelectors.getStateIsSuccess).pipe(
+    map(activeTask => {
+      console.log(activeTask);
+      return activeTask;
+    }));
+
+  constructor(private router: Router, private store: Store) { }
 
   ngOnInit(): void { }
 

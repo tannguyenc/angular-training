@@ -4,7 +4,6 @@ import { Store } from '@ngrx/store';
 import * as StateSelectors from '@task-reminder-client/states/task';
 import * as StateActions from '@task-reminder-client/states/task';
 import { map } from 'rxjs';
-import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'task-reminder-client-task-overdue',
@@ -32,8 +31,7 @@ export class TaskOverdueComponent implements OnInit {
     })
   )
 
-  constructor(private store: Store,
-    private datepipe: DatePipe) {}
+  constructor(private store: Store) {}
 
   ngOnInit(): void {
     this.store.dispatch(StateActions.allTask({ request: TaskReminderStatus.Overdue }));

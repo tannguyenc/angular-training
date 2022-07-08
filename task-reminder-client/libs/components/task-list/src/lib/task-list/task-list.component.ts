@@ -33,16 +33,15 @@ export class TaskListComponent {
   // }
 
   isDone(id: number, isDone: boolean) {
-    let message = 'Are you sure that you want to proceed?';
-    let header = 'Confirmation';
+    let message = 'Are you sure that you want mark as undone?';
+    let header = 'Mark as undone';
     if (isDone) {
-      message = 'Are you sure that you want to proceed?';
-      header = 'Confirmation';
+      message = 'Are you sure that you want to mark as done?';
+      header = 'Mark as done';
     }
     this.confirmationService.confirm({
       message: message,
       header: header,
-      icon: 'pi pi-exclamation-triangle',
       accept: () => {
         const doneTask = {
           id: id,

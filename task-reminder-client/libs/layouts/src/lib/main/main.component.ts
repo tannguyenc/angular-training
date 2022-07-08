@@ -24,12 +24,6 @@ export class MainComponent implements OnDestroy {
       contentStyle: { "max-height": "500px", "overflow": "auto" },
       baseZIndex: 10000
     });
-
-    // this.ref.onClose.subscribe((product: Product) => {
-    //   if (product) {
-    //     this.messageService.add({ severity: 'info', summary: 'Product Selected', detail: product.name });
-    //   }
-    // });
   }
 
   ngOnDestroy() {

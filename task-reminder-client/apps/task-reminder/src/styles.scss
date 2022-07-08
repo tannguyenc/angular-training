@@ -90,7 +90,7 @@ body {
   padding: 0;
 }
 
-.p-datepicker .p-timepicker > div {
+.p-datepicker .p-timepicker>div {
   padding: 0 0.25rem;
 }
 
@@ -102,6 +102,7 @@ body {
 .p-datepicker .p-timepicker span {
   font-size: .9rem;
 }
+
 //end calendar
 
 .p-inputtext.p-inputtext-sm {
@@ -124,6 +125,12 @@ body {
   color: #00bcd4;
   background-color: rgba(153, 153, 153, 0.2);
   border-color: #00bcd4;
+}
+
+.add-task .p-button:enabled:hover {
+  color: white;
+  background-color: rgb(21, 128, 61, 1);
+  border-color: rgb(21, 128, 61, 1);
 }
 
 .submit:enabled:hover {
@@ -151,7 +158,31 @@ body {
 }
 
 .required:after {
-  content:" *";
+  content: " *";
   margin-left: 0.125rem;
   color: red;
+}
+
+.p-accordion .p-accordion-header .p-accordion-header-link {
+  color: rgb(0, 188, 212, 1) !important;
+  padding: .8rem;
+}
+
+.noti-info .active {
+  animation: shake 1.5s infinite;
+}
+
+.p-accordion .p-accordion-header:not(.p-disabled) .p-accordion-header-link:focus {
+  box-shadow: none;
+}
+
+@keyframes shake {
+  0% {transform: rotate(35deg);}
+  12.5% {transform: rotate(-30deg);}
+  25% {transform: rotate(25deg);}
+  37.5% {transform: rotate(-20deg);}
+  50% {transform: rotate(15deg);}
+  62.5% {transform: rotate(-10deg)}
+  75% {transform: rotate(5deg)}
+  100% {transform: rotate(0);}
 }

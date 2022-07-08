@@ -1,33 +1,26 @@
-<div class="h-full flex flex-col overflow-hidden">
+<div class="h-full flex items-stretch flex-col">
   <!-- header -->
   <div class="header">
     <task-reminder-client-header>
-
     </task-reminder-client-header>
   </div>
-
   <!--main content -->
-  <div class="main-content grid grid-cols-4 flex-1 h-0">
+  <div class="main-content grid grid-cols-12 flex-1 h-0">
     <!-- left menu -->
-    <div class="left-menu h-full">
+    <div class="left-menu col-span-3 h-full">
       <task-reminder-client-left-menu>
-
       </task-reminder-client-left-menu>
     </div>
     <!-- content -->
-    <div class="content col-span-3 h-full overflow-hidden">
-      <div class="grid grid-cols-12 h-full">
-        <div class="col-span-10 h-full overflow-auto">
-          <div class="h-full">
-            <p-scrollPanel [style]="{width: '100%', height: '100%'}">
-              <router-outlet></router-outlet>
-            </p-scrollPanel>
-          </div>
-        </div>
-        <div class="col-span-2 add-button h-full text-center">
-          <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-warning" (click)="addTaskReminder()"></button>
-        </div>
-      </div>
+    <div class="content col-span-7 h-full overflow-hidden">
+      <p-scrollPanel [style]="{width: '100%', height: '100%'}">
+        <router-outlet></router-outlet>
+      </p-scrollPanel>
+    </div>
+    <div class="col-span-2 add-button h-full text-center">
+      <button pButton pRipple type="button" icon="pi pi-plus" class="drop-shadow-xl
+       p-button-rounded p-button-warning relative -top-6"
+        (click)="addTaskReminder()"></button>
     </div>
   </div>
 </div>
