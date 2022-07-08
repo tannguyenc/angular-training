@@ -25,7 +25,7 @@ namespace TaskReminderAPI.Controllers
                 switch (request)
                 {
                     case TaskReminderStatus.All:
-                        datas = datas.Where(x => x.DueDate.Value.Date >= DateTime.Now.Date).ToList();
+                        datas = datas.ToList();
                         break;
                     case TaskReminderStatus.Today:
                         datas = datas.Where(x => x.DueDate.Value.Date == DateTime.Now.Date).ToList();
