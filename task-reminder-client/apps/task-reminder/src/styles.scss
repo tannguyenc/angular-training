@@ -2,6 +2,187 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
-html, body {
+
+html,
+body {
   @apply h-full;
+}
+
+.p-component {
+  font-size: .9rem;
+}
+
+.p-dialog .p-dialog-header .p-dialog-title {
+  font-size: 1.3rem;
+}
+
+.p-button.p-button-sm {
+  font-size: 0.65rem;
+  padding: 0.45rem 0.45rem;
+}
+
+.p-calendar {
+  width: 100%;
+}
+
+.p-calendar .p-datepicker {
+  padding: 0;
+}
+
+.p-calendar-w-btn .p-datepicker-trigger {
+  background-color: #00bcd4;
+  border: 1px solid #00bcd4;
+  height: 2rem;
+}
+
+.p-calendar-w-btn .p-datepicker-trigger:enabled:hover {
+  color: #fff;
+  background-color: #00aec5;
+  border-color: #008697;
+}
+
+.p-calendar-w-btn .p-inputtext,
+.p-calendar .p-inputtext {
+  padding: 0.45rem;
+  height: 2rem;
+}
+
+// calendar
+.p-datepicker table td {
+  padding: 0.2rem !important;
+}
+
+.p-datepicker table td>span {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.p-datepicker table {
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+.p-datepicker .p-datepicker-header {
+  padding: 0.2rem;
+}
+
+.p-datepicker .p-datepicker-header .p-datepicker-title {
+  line-height: 1rem;
+}
+
+.p-datepicker .p-monthpicker {
+  margin: 0;
+}
+
+.p-datepicker .p-yearpicker {
+  margin: 0;
+}
+
+.p-datepicker .p-monthpicker .p-monthpicker-month {
+  padding: 0.25rem;
+}
+
+.p-datepicker .p-yearpicker .p-yearpicker-year {
+  padding: 0.25rem;
+}
+
+.p-datepicker .p-timepicker {
+  padding: 0;
+}
+
+.p-datepicker .p-timepicker>div {
+  padding: 0 0.25rem;
+}
+
+.p-datepicker .p-timepicker button {
+  width: 1rem;
+  height: 1rem;
+}
+
+.p-datepicker .p-timepicker span {
+  font-size: .9rem;
+}
+
+//end calendar
+
+.p-inputtext.p-inputtext-sm {
+  padding: 0.3rem 0.3rem;
+}
+
+.p-dialog .p-dialog-header {
+  padding: 1rem;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 0 1rem 1rem 1rem;
+}
+
+.ui-dialog-resizable .ui-dialog-content {
+  overflow: unset;
+}
+
+.p-button:enabled:hover {
+  color: #00bcd4;
+  background-color: rgba(153, 153, 153, 0.2);
+  border-color: #00bcd4;
+}
+
+.add-task .p-button:enabled:hover {
+  color: white;
+  background-color: rgb(21, 128, 61, 1);
+  border-color: rgb(21, 128, 61, 1);
+}
+
+.submit:enabled:hover {
+  color: #fff;
+  background-color: #00aec5;
+  border-color: #008697;
+}
+
+.p-dialog .p-dialog-footer button {
+  background-color: white;
+  color: #00bcd4;
+  border: 1px solid #00bcd4;
+  padding: 0.45rem 0.45rem;
+}
+
+.p-dialog .p-dialog-footer .p-confirm-dialog-accept {
+  color: #fff;
+  background-color: #00bcd4;
+}
+
+.p-dialog .p-dialog-footer .p-confirm-dialog-accept:hover {
+  color: #fff;
+  background-color: #00aec5;
+  border: 1px solid #008697;
+}
+
+.required:after {
+  content: " *";
+  margin-left: 0.125rem;
+  color: red;
+}
+
+.p-accordion .p-accordion-header .p-accordion-header-link {
+  color: rgb(0, 188, 212, 1) !important;
+  padding: .8rem;
+}
+
+.noti-info .active {
+  animation: shake 1.5s infinite;
+}
+
+.p-accordion .p-accordion-header:not(.p-disabled) .p-accordion-header-link:focus, .p-button:focus {
+  box-shadow: none;
+}
+
+@keyframes shake {
+  0% {transform: rotate(35deg);}
+  12.5% {transform: rotate(-30deg);}
+  25% {transform: rotate(25deg);}
+  37.5% {transform: rotate(-20deg);}
+  50% {transform: rotate(15deg);}
+  62.5% {transform: rotate(-10deg)}
+  75% {transform: rotate(5deg)}
+  100% {transform: rotate(0);}
 }

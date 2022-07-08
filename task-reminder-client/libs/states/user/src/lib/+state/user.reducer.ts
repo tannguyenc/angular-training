@@ -35,6 +35,7 @@ const userReducer = createReducer(
   on(UserActions.loginSuccess,
     (state, { token }) => {
       const userId = token.split('-').pop();
+      //localStorage.setItem('token', token);
       return { ...state, loaded: true, token, userId: userId }
     }),
   on(UserActions.loginFailure,

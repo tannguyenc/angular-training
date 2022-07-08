@@ -9,7 +9,7 @@ const routes: Routes = [
     children: [
       {
         path: 'home',
-        // canActivate: [AuthGuardService],
+        canActivate: [AuthGuardService],
         loadChildren: () => import("@task-reminder-client/pages/home").then(m => m.PagesHomeModule)
       },
       {

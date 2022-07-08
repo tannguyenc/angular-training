@@ -1,6 +1,8 @@
 import { IUpdateDone, ITaskReminderDetail } from './../../../../../datas/task-reminder';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { AddOrUpdateTaskComponent } from 'libs/pages/home/src/lib/home/add-or-update-task/add-or-update-task.component';
 
 @Component({
   selector: 'task-reminder-client-task-list',
@@ -14,7 +16,7 @@ export class TaskListComponent {
   // @Input() tasks: ITaskResponse[] = [];
   @Input()
   set tasks(value: ITaskReminderDetail[] | []) {
-    this._task = value;
+    this._task = value.sort((a, b) => { return a.dueDate.getTime() - b.dueDate.getTime(); });
   }
 
   get tasks(): ITaskReminderDetail[] | [] {
@@ -23,16 +25,23 @@ export class TaskListComponent {
 
   @Output() onUpdateDone: EventEmitter<IUpdateDone> = new EventEmitter();
 
-  constructor(private confirmationService: ConfirmationService) { }
+  ref: DynamicDialogRef | undefined;
+
+  constructor(private confirmationService: ConfirmationService, private dialogService: DialogService) { }
 
   // ngOnInit(): void {
   // }
 
   isDone(id: number, isDone: boolean) {
+    let message = 'Are you sure that you want mark as undone?';
+    let header = 'Mark as undone';
+    if (isDone) {
+      message = 'Are you sure that you want to mark as done?';
+      header = 'Mark as done';
+    }
     this.confirmationService.confirm({
-      message: 'Are you sure that you want to proceed?',
-      header: 'Confirmation',
-      icon: 'pi pi-exclamation-triangle',
+      message: message,
+      header: header,
       accept: () => {
         const doneTask = {
           id: id,
@@ -41,6 +50,20 @@ export class TaskListComponent {
 
         this.onUpdateDone.emit(doneTask);
       }
+    });
+  }
+
+  openTaskDetail(task: ITaskReminderDetail) {
+    const taskDetail = {
+      ...task,
+      dueTime: task.dueDate
+    };
+    this.ref = this.dialogService.open(AddOrUpdateTaskComponent, {
+      data: taskDetail,
+      header: 'Update Task Reminder',
+      width: '40%',
+      contentStyle: { "max-height": "500px", "overflow": "auto" },
+      baseZIndex: 10000
     });
   }
 }

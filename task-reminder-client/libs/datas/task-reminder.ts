@@ -16,7 +16,7 @@ export interface ITaskReminderDetail {
   nameDay: string;
   description: string;
   created: Date;
-  dueDate: string;
+  dueDate: Date;
   done: boolean;
   deleted: boolean;
   // [key: string]: any;
@@ -25,4 +25,11 @@ export interface ITaskReminderDetail {
 export interface IUpdateDone {
   id: number;
   isDone: boolean;
+}
+
+export interface IAddTaskReminder {
+  id: number;
+  name: string;
+  description: string;
+  dueDate: Date;
 }

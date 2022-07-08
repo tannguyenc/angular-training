@@ -16,10 +16,10 @@ export class TaskOverdueComponent implements OnInit {
     map(tasks => {
 
       const groupByDay = tasks.reduce((r, a) => {
-            r[a.dueDate] = r[a.dueDate] || [];
-            r[a.dueDate].push(a);
-            return r;
-        }, Object.create([]));
+        r['nameDay'] = r['nameDay'] || [];
+        r['nameDay'].push(a);
+        return r;
+      }, Object.create([]));
 
       const arrGroupByDay =  Object.keys(groupByDay).map(key => ({
         tasks: groupByDay[key],

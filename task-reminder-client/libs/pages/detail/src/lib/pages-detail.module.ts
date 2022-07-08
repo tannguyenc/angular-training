@@ -9,5 +9,6 @@ import { DetailComponent } from './detail/detail.component';
   PageDetailRoutes
 ],
   declarations: [DetailComponent],
+  exports: [DetailComponent]
 })
 export class PagesDetailModule {}

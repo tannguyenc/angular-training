@@ -7,7 +7,13 @@ module.exports = {
     "./libs/**/*.ts"
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'regal-blue': '#00bcd4',
+        'regal-blue-hover': '#00aec5',
+        'regal-blue-hover-border': '#008697',
+      },
+    },
   },
   plugins: [],
 }

@@ -1,4 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import * as StateSelectors from '@task-reminder-client/states/task';
+import * as StateActions from '@task-reminder-client/states/task';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'task-reminder-client-header',
@@ -6,7 +11,23 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit {
-  constructor() {}
 
-  ngOnInit(): void {}
+  isRing = false;
+  activeTask$ = this.store.select(StateSelectors.getStateIsSuccess).subscribe(isSucccess => {
+    this.isRing = isSucccess;
+    if (this.isRing) {
+      setTimeout(() => {
+        this.store.dispatch(StateActions.IsSuccessTaskSuccess({ isSuccess: false }));
+      }, 1000);
+    }
+  });
+
+  constructor(private router: Router, private store: Store) { }
+
+  ngOnInit(): void { }
+
+  logOut() {
+    localStorage.removeItem('token');
+    this.router.navigate(['/login']);
+  }
 }
