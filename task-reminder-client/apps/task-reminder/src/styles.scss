@@ -172,7 +172,7 @@ body {
   animation: shake 1.5s infinite;
 }
 
-.p-accordion .p-accordion-header:not(.p-disabled) .p-accordion-header-link:focus {
+.p-accordion .p-accordion-header:not(.p-disabled) .p-accordion-header-link:focus, .p-button:focus {
   box-shadow: none;
 }
 

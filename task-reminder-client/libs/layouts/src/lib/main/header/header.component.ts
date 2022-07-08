@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import * as StateSelectors from '@task-reminder-client/states/task';
+import * as StateActions from '@task-reminder-client/states/task';
 import { map } from 'rxjs';
 
 @Component({
@@ -11,11 +12,15 @@ import { map } from 'rxjs';
 })
 export class HeaderComponent implements OnInit {
 
-  activeTask$ = this.store.select(StateSelectors.getStateIsSuccess).pipe(
-    map(activeTask => {
-      console.log(activeTask);
-      return activeTask;
-    }));
+  isRing = false;
+  activeTask$ = this.store.select(StateSelectors.getStateIsSuccess).subscribe(isSucccess => {
+    this.isRing = isSucccess;
+    if (this.isRing) {
+      setTimeout(() => {
+        this.store.dispatch(StateActions.IsSuccessTaskSuccess({ isSuccess: false }));
+      }, 1000);
+    }
+  });
 
   constructor(private router: Router, private store: Store) { }
 

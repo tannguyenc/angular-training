@@ -74,3 +74,8 @@ export const UpdateTaskFailure = createAction(
   '[State/API] Update task failure',
   props<{ error: HttpErrorResponse }>()
 );
+
+export const IsSuccessTaskSuccess = createAction(
+  '[State/API] Is Success task success',
+  props<{ isSuccess: boolean }>()
+);

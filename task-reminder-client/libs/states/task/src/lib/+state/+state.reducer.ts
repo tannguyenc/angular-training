@@ -42,6 +42,8 @@ const stateReducer = createReducer(
     (state, { task }) => stateAdapter.updateOne({ id: task.id, changes: task }, { ...state, loaded: true, isSuccess: true })),
   on(StateActions.AddTaskSuccess,
     (state, { task }) => stateAdapter.addOne(task, { ...state, loaded: true, isSuccess: true })),
+  on(StateActions.IsSuccessTaskSuccess,
+    (state, { isSuccess }) => ({ ...state, loaded: true, isSuccess: isSuccess })),
 );
 
 export function reducer(state: State | undefined, action: Action) {
