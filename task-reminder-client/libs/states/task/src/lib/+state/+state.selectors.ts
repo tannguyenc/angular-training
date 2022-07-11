@@ -25,6 +25,14 @@ export const getAllState = createSelector(getStateState, (state: State) =>
   selectAll(state).sort((a, b) => { return a.dueDate.getTime() - b.dueDate.getTime(); })
 );
 
+export const getAllStateNotCompleted = createSelector(getStateState, (state: State) =>
+  selectAll(state).filter(t => !t.done).sort((a, b) => { return a.dueDate.getTime() - b.dueDate.getTime(); })
+);
+
+export const getAllStateCompleted = createSelector(getStateState, (state: State) =>
+  selectAll(state).filter(t => t.done).sort((a, b) => { return a.dueDate.getTime() - b.dueDate.getTime(); })
+);
+
 export const getStateEntities = createSelector(getStateState, (state: State) =>
   selectEntities(state)
 );

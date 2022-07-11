@@ -12,7 +12,7 @@ import { map } from 'rxjs';
 })
 export class CompletedComponent implements OnInit {
 
-  tasks$ = this.store.select(StateSelectors.getAllState).pipe(
+  tasks$ = this.store.select(StateSelectors.getAllStateCompleted).pipe(
     map(tasks => {
 
       const groupByDay = tasks.reduce((r, a) => {
@@ -21,7 +21,7 @@ export class CompletedComponent implements OnInit {
         return r;
       }, Object.create([]));
 
-      const arrGroupByDay =  Object.keys(groupByDay).map(key => ({
+      const arrGroupByDay = Object.keys(groupByDay).map(key => ({
         tasks: groupByDay[key],
         day: groupByDay[key][0]['dueDate'],
         nameDay: groupByDay[key][0]['nameDay']
