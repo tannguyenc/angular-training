@@ -27,6 +27,9 @@ namespace TaskReminderAPI.Controllers
                     case TaskReminderStatus.All:
                         datas = datas.Where(x => !x.Done).ToList();
                         break;
+                    case TaskReminderStatus.Upcoming:
+                        datas = datas.Where(x => !x.Done && x.DueDate.HasValue && x.DueDate.Value.Date > DateTime.Now.Date).ToList();
+                        break;
                     case TaskReminderStatus.Today:
                         datas = datas.Where(x => !x.Done && x.DueDate.HasValue && x.DueDate.Value.Date == DateTime.Now.Date).ToList();
                         break;
@@ -52,40 +55,6 @@ namespace TaskReminderAPI.Controllers
                     TaskReminderStatus.Today.ToString() : TaskReminderStatus.Upcoming.ToString(),
                 }).ToList();
             }
-
-            return results;
-            //if (datas.Any())
-            //{
-            //    var timeNow = DateTime.Now.Date;
-            //    switch (request)
-            //    {
-            //        case TaskReminderStatus.All:
-            //            datas = datas.Where(x => x.DueDate.Value.Date >= DateTime.Now.Date).ToList();
-            //            break;
-            //        case TaskReminderStatus.Today:
-            //            datas = datas.Where(x => x.DueDate.Value.Date == DateTime.Now.Date).ToList();
-            //            break;
-            //        case TaskReminderStatus.Overdue:
-            //            datas = datas.Where(x => x.DueDate.Value.Date < DateTime.Now.Date).ToList();
-            //            break;
-            //    }
-
-            //    results = datas.GroupBy(x => x.DueDate.Value.Date).Select(x => new TaskReminderModel
-            //    {
-            //        Day = x.Key,
-            //        NameDay = x.Key < timeNow ? "Overdue" : x.Key == timeNow ? "Today" : "Upcoming",
-            //        Tasks = x.Select(y => new TaskReminderDetailModel
-            //        {
-            //            Id = y.Id,
-            //            Created = y.Created,
-            //            Deleted = y.Deleted,
-            //            Description = y.Description,
-            //            Done = y.Done,
-            //            DueDate = y.DueDate,
-            //            Name = y.Name,
-            //        }).ToList()
-            //    }).ToList();
-            //}
 
             return results;
         }
