@@ -25,13 +25,16 @@ namespace TaskReminderAPI.Controllers
                 switch (request)
                 {
                     case TaskReminderStatus.All:
-                        datas = datas.ToList();
+                        datas = datas.Where(x => !x.Done).ToList();
                         break;
                     case TaskReminderStatus.Today:
-                        datas = datas.Where(x => x.DueDate.Value.Date == DateTime.Now.Date).ToList();
+                        datas = datas.Where(x => !x.Done && x.DueDate.HasValue && x.DueDate.Value.Date == DateTime.Now.Date).ToList();
                         break;
                     case TaskReminderStatus.Overdue:
-                        datas = datas.Where(x => x.DueDate.Value.Date < DateTime.Now.Date).ToList();
+                        datas = datas.Where(x => !x.Done && x.DueDate.HasValue && x.DueDate.Value.Date < DateTime.Now.Date).ToList();
+                        break;
+                    case TaskReminderStatus.Completed:
+                        datas = datas.Where(x => x.Done).ToList();
                         break;
                 }
 
@@ -44,7 +47,9 @@ namespace TaskReminderAPI.Controllers
                     DueDate = x.DueDate.Value,
                     Id = x.Id,
                     Name = x.Name,
-                    NameDay = x.DueDate.Value.Date < timeNow ? "Overdue" : x.DueDate.Value.Date == timeNow ? "Today" : "Upcoming",
+                    NameDay = x.Done ? TaskReminderStatus.Completed.ToString() : x.DueDate.Value.Date < timeNow ? 
+                    TaskReminderStatus.Overdue.ToString() : x.DueDate.Value.Date == timeNow ?
+                    TaskReminderStatus.Today.ToString() : TaskReminderStatus.Upcoming.ToString(),
                 }).ToList();
             }
 
@@ -130,7 +135,9 @@ namespace TaskReminderAPI.Controllers
                 DueDate = taskReminder.DueDate.Value,
                 Id = taskReminder.Id,
                 Name = taskReminder.Name,
-                NameDay = taskReminder.DueDate.Value.Date < timeNow ? "Overdue" : taskReminder.DueDate.Value.Date == timeNow ? "Today" : "Upcoming",
+                NameDay = taskReminder.Done ? TaskReminderStatus.Completed.ToString() : taskReminder.DueDate.Value.Date < timeNow ?
+                    TaskReminderStatus.Overdue.ToString() : taskReminder.DueDate.Value.Date == timeNow ?
+                    TaskReminderStatus.Today.ToString() : TaskReminderStatus.Upcoming.ToString()
             });
 
             //return CreatedAtAction(nameof(GetById), new { id = taskReminder.Id }, taskReminder);
@@ -162,7 +169,9 @@ namespace TaskReminderAPI.Controllers
                 DueDate = taskReminder.DueDate.Value,
                 Id = taskReminder.Id,
                 Name = taskReminder.Name,
-                NameDay = taskReminder.DueDate.Value.Date < timeNow ? "Overdue" : taskReminder.DueDate.Value.Date == timeNow ? "Today" : "Upcoming",
+                NameDay = taskReminder.Done ? TaskReminderStatus.Completed.ToString() : taskReminder.DueDate.Value.Date < timeNow ?
+                    TaskReminderStatus.Overdue.ToString() : taskReminder.DueDate.Value.Date == timeNow ?
+                    TaskReminderStatus.Today.ToString() : TaskReminderStatus.Upcoming.ToString()
             });
             //return Ok(taskReminder);
         }
@@ -188,7 +197,9 @@ namespace TaskReminderAPI.Controllers
                 DueDate = taskReminder.DueDate.Value,
                 Id = taskReminder.Id,
                 Name = taskReminder.Name,
-                NameDay = taskReminder.DueDate.Value.Date < timeNow ? "Overdue" : taskReminder.DueDate.Value.Date == timeNow ? "Today" : "Upcoming",
+                NameDay = taskReminder.Done ? TaskReminderStatus.Completed.ToString() : taskReminder.DueDate.Value.Date < timeNow ?
+                    TaskReminderStatus.Overdue.ToString() : taskReminder.DueDate.Value.Date == timeNow ?
+                    TaskReminderStatus.Today.ToString() : TaskReminderStatus.Upcoming.ToString()
             });
         }
 

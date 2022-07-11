@@ -33,6 +33,13 @@ export class LeftMenuComponent implements OnInit {
       command: () => {
         this.router.navigate(['/home/overdue']);
       }
+    },
+    {
+      label: 'Completed tasks',
+      icon: 'pi pi-check-square',
+      command: () => {
+        this.router.navigate(['/home/completed']);
+      }
     }
     ];
   }
