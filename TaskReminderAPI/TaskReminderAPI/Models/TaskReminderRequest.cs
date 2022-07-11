@@ -6,7 +6,9 @@ namespace TaskReminderAPI.Models
     {
         All = 0,
         Today = 10,
-        Overdue = 20
+        Overdue = 20,
+        Completed = 30,
+        Upcoming = 40
     }
 
     public class TaskReminderRequest

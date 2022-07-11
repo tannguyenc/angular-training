@@ -6,13 +6,13 @@ import * as StateActions from '@task-reminder-client/states/task';
 import { map } from 'rxjs';
 
 @Component({
-  selector: 'task-reminder-client-task-overdue',
-  templateUrl: './task-overdue.component.html',
-  styleUrls: ['./task-overdue.component.scss'],
+  selector: 'task-reminder-client-completed',
+  templateUrl: './completed.component.html',
+  styleUrls: ['./completed.component.scss'],
 })
-export class TaskOverdueComponent implements OnInit {
+export class CompletedComponent implements OnInit {
 
-  tasks$ = this.store.select(StateSelectors.getAllStateNotCompleted).pipe(
+  tasks$ = this.store.select(StateSelectors.getAllStateCompleted).pipe(
     map(tasks => {
 
       const groupByDay = tasks.reduce((r, a) => {
@@ -21,7 +21,7 @@ export class TaskOverdueComponent implements OnInit {
         return r;
       }, Object.create([]));
 
-      const arrGroupByDay =  Object.keys(groupByDay).map(key => ({
+      const arrGroupByDay = Object.keys(groupByDay).map(key => ({
         tasks: groupByDay[key],
         day: groupByDay[key][0]['dueDate'],
         nameDay: groupByDay[key][0]['nameDay']
@@ -31,10 +31,10 @@ export class TaskOverdueComponent implements OnInit {
     })
   )
 
-  constructor(private store: Store) {}
+  constructor(private store: Store) { }
 
   ngOnInit(): void {
-    this.store.dispatch(StateActions.allTask({ request: TaskReminderStatus.Overdue }));
+    this.store.dispatch(StateActions.allTask({ request: TaskReminderStatus.Completed }));
   }
 
   onUpdateDone(doneTask: IUpdateDone) {
