@@ -9,19 +9,20 @@ import { TaskTodayComponent } from './home/task-today/task-today.component';
 import { TaskOverdueComponent } from './home/task-overdue/task-overdue.component';
 import { ComponentsTaskListModule } from '@task-reminder-client/components/task-list';
 import { StatesTaskModule } from '@task-reminder-client/states/task';
-import {ConfirmDialogModule} from 'primeng/confirmdialog';
-import {ConfirmationService} from 'primeng/api';
-import {InputTextModule} from 'primeng/inputtext';
-import {CalendarModule} from 'primeng/calendar';
-import { FormsModule, ReactiveFormsModule  } from '@angular/forms';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
+import { InputTextModule } from 'primeng/inputtext';
+import { CalendarModule } from 'primeng/calendar';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import {InputTextareaModule} from 'primeng/inputtextarea';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 import { MessageService } from 'primeng/api';
-import {MessagesModule} from 'primeng/messages';
-import {MessageModule} from 'primeng/message';
-import {ToastModule} from 'primeng/toast';
+import { MessagesModule } from 'primeng/messages';
+import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
 import { DatePipe } from '@angular/common';
-import {AccordionModule} from 'primeng/accordion';
+import { AccordionModule } from 'primeng/accordion';
+import { CompletedComponent } from './home/completed/completed.component';
 
 @NgModule({
   imports: [
@@ -39,7 +40,7 @@ import {AccordionModule} from 'primeng/accordion';
     MessageModule,
     ToastModule,
     ReactiveFormsModule,
-    AccordionModule
+    AccordionModule,
   ],
   declarations: [
     HomeComponent,
@@ -48,11 +49,8 @@ import {AccordionModule} from 'primeng/accordion';
     AddOrUpdateTaskComponent,
     TaskTodayComponent,
     TaskOverdueComponent,
+    CompletedComponent,
   ],
-  providers: [
-    ConfirmationService,
-    MessageService,
-    DatePipe
-  ]
+  providers: [ConfirmationService, MessageService, DatePipe],
 })
 export class PagesHomeModule {}

@@ -4,6 +4,7 @@ import { TasksComponent } from './home/tasks/tasks.component';
 import { TaskTodayComponent } from './home/task-today/task-today.component';
 import { TaskOverdueComponent } from './home/task-overdue/task-overdue.component';
 import { AuthGuardService } from '@task-reminder-client/states/user';
+import { CompletedComponent } from './home/completed/completed.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'all', pathMatch: 'full' },
@@ -25,6 +26,11 @@ const routes: Routes = [
         path: 'overdue',
         canActivate: [AuthGuardService],
         component: TaskOverdueComponent
+      },
+      {
+        path: 'completed',
+        canActivate: [AuthGuardService],
+        component: CompletedComponent
       }
     ]
   },

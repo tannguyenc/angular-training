@@ -1,0 +1,15 @@
+<div class="task-list ml-0 mt-0 shadow-xl">
+  <p-accordion>
+    <div class="tasks-one-day" *ngFor="let task of (tasks$ | async) || []">
+      <p-accordionTab header="{{task.nameDay}}" [selected]="true">
+        <!-- <div class="title flex m-3">
+          <p class="title-name text-regal-blue font-bold">
+            {{task.nameDay}}
+          </p>
+        </div> -->
+        <task-reminder-client-task-list (onUpdateDone)="onUpdateDone($event)" [tasks]="task.tasks">
+        </task-reminder-client-task-list>
+      </p-accordionTab>
+    </div>
+  </p-accordion>
+</div>
