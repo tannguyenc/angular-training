@@ -23,6 +23,7 @@ import { ToastModule } from 'primeng/toast';
 import { DatePipe } from '@angular/common';
 import { AccordionModule } from 'primeng/accordion';
 import { CompletedComponent } from './home/completed/completed.component';
+import { UpcomingComponent } from './home/upcoming/upcoming.component';
 
 @NgModule({
   imports: [
@@ -50,6 +51,7 @@ import { CompletedComponent } from './home/completed/completed.component';
     TaskTodayComponent,
     TaskOverdueComponent,
     CompletedComponent,
+    UpcomingComponent,
   ],
   providers: [ConfirmationService, MessageService, DatePipe],
 })

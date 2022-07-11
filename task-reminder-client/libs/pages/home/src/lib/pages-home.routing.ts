@@ -1,3 +1,4 @@
+import { UpcomingComponent } from './home/upcoming/upcoming.component';
 import { HomeComponent } from './home/home.component';
 import { Routes, RouterModule } from '@angular/router';
 import { TasksComponent } from './home/tasks/tasks.component';
@@ -16,6 +17,11 @@ const routes: Routes = [
         path: 'all',
         canActivate: [AuthGuardService],
         component: TasksComponent
+      },
+      {
+        path: 'upcoming',
+        canActivate: [AuthGuardService],
+        component: UpcomingComponent
       },
       {
         path: 'today',

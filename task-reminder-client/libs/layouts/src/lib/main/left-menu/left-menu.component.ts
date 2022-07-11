@@ -15,9 +15,16 @@ export class LeftMenuComponent implements OnInit {
   ngOnInit() {
     this.items = [{
       label: 'All tasks',
-      icon: 'pi pi-calendar-plus',
+      icon: 'pi pi-calendar-times',
       command: () => {
         this.router.navigate(['/home/all']);
+      }
+    },
+    {
+      label: 'Upcoming tasks',
+      icon: 'pi pi-calendar-plus',
+      command: () => {
+        this.router.navigate(['/home/upcoming']);
       }
     },
     {
@@ -29,7 +36,7 @@ export class LeftMenuComponent implements OnInit {
     },
     {
       label: 'Overdue tasks',
-      icon: 'pi pi-calendar-times',
+      icon: 'pi pi-calendar-minus',
       command: () => {
         this.router.navigate(['/home/overdue']);
       }
