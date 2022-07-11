@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { ITaskResponse, IUpdateDone, TaskReminderStatus, ITaskReminderDetail } from './../../../../../../datas/task-reminder';
+import { IUpdateDone, TaskReminderStatus } from './../../../../../../datas/task-reminder';
 import * as StateSelectors from '@task-reminder-client/states/task';
 import * as StateActions from '@task-reminder-client/states/task';
 import { map } from 'rxjs';
-import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'task-reminder-client-tasks',
@@ -12,7 +11,7 @@ import { DatePipe } from '@angular/common';
   styleUrls: ['./tasks.component.scss'],
 })
 export class TasksComponent implements OnInit {
-
+  activeTabs: boolean[] = [true, false, false];
   tasks$ = this.store.select(StateSelectors.getAllState).pipe(
     map(tasks => {
       const groupByDay = tasks.reduce((r, a) => {
@@ -21,18 +20,24 @@ export class TasksComponent implements OnInit {
         return r;
       }, Object.create([]));
 
-      const arrGroupByDay = Object.keys(groupByDay).map(key => ({
-        tasks: groupByDay[key],
-        nameDay: groupByDay[key][0]['nameDay']
-      }));
+      const arrGroupByDay = Object.keys(groupByDay).map(key => {
+        const nameDay = groupByDay[key][0]['nameDay'];
+        const task = {
+          tasks: groupByDay[key],
+          nameDay: nameDay,
+          order: nameDay === 'Today' ? 0 :
+            nameDay === 'Upcoming' ? 1 : 2
+        };
+        return task;
+      }
+      ).sort((a, b) => { return a.order - b.order; });
 
       return arrGroupByDay;
     })
   )
 
   constructor(
-    private store: Store,
-    private datepipe: DatePipe
+    private store: Store
   ) { }
 
   ngOnInit(): void {
@@ -42,4 +47,13 @@ export class TasksComponent implements OnInit {
   onUpdateDone(doneTask: IUpdateDone) {
     this.store.dispatch(StateActions.updateDoneTask({ id: doneTask.id, isDone: doneTask.isDone }));
   }
+
+  onTabClose(event: any) {
+    this.activeTabs[event.index] = false;
+  }
+
+  onTabOpen(event: any) {
+    this.activeTabs[event.index] = true;
+  }
+
 }
