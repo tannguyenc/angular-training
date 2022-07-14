@@ -25,6 +25,7 @@ export class TasksComponent implements OnInit {
         const task = {
           tasks: groupByDay[key],
           nameDay: nameDay,
+          header: `${nameDay} (${groupByDay[key].length})`,
           order: nameDay === 'Today' ? 0 :
             nameDay === 'Upcoming' ? 1 : 2
         };

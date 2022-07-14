@@ -24,7 +24,8 @@ export class UpcomingComponent implements OnInit {
         const nameDay = groupByDay[key][0]['nameDay'];
         const task = {
           tasks: groupByDay[key],
-          nameDay: nameDay
+          nameDay: nameDay,
+          header: `${nameDay} (${groupByDay[key].length})`,
         };
         return task;
       }
