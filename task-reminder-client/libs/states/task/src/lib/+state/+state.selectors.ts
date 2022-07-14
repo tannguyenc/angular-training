@@ -25,6 +25,18 @@ export const getAllState = createSelector(getStateState, (state: State) =>
   selectAll(state).sort((a, b) => { return a.dueDate.getTime() - b.dueDate.getTime(); })
 );
 
+export const getAllStateUpcomingStatus = createSelector(getStateState, (state: State) =>
+  selectAll(state).filter(t => !t.done && t.nameDay === "Upcoming").sort((a, b) => { return a.dueDate.getTime() - b.dueDate.getTime(); })
+);
+
+export const getAllStateTodayStatus = createSelector(getStateState, (state: State) =>
+  selectAll(state).filter(t => !t.done && t.nameDay === "Today").sort((a, b) => { return a.dueDate.getTime() - b.dueDate.getTime(); })
+);
+
+export const getAllStateOverdueStatus = createSelector(getStateState, (state: State) =>
+  selectAll(state).filter(t => !t.done && t.nameDay === "Overdue").sort((a, b) => { return a.dueDate.getTime() - b.dueDate.getTime(); })
+);
+
 export const getAllStateNotCompleted = createSelector(getStateState, (state: State) =>
   selectAll(state).filter(t => !t.done).sort((a, b) => { return a.dueDate.getTime() - b.dueDate.getTime(); })
 );

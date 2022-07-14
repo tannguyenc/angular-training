@@ -2,7 +2,8 @@ export enum TaskReminderStatus {
   All = 0,
   Today = 10,
   Overdue = 20,
-  Completed = 30
+  Completed = 30,
+  Upcoming = 40
 }
 
 export interface ITaskResponse {

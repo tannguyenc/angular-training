@@ -12,7 +12,7 @@ import { map } from 'rxjs';
 })
 export class TaskOverdueComponent implements OnInit {
 
-  tasks$ = this.store.select(StateSelectors.getAllStateNotCompleted).pipe(
+  tasks$ = this.store.select(StateSelectors.getAllStateOverdueStatus).pipe(
     map(tasks => {
 
       const groupByDay = tasks.reduce((r, a) => {
