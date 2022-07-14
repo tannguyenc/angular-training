@@ -21,11 +21,16 @@ export class TaskOverdueComponent implements OnInit {
         return r;
       }, Object.create([]));
 
-      const arrGroupByDay =  Object.keys(groupByDay).map(key => ({
-        tasks: groupByDay[key],
-        day: groupByDay[key][0]['dueDate'],
-        nameDay: groupByDay[key][0]['nameDay']
-      }));
+      const arrGroupByDay = Object.keys(groupByDay).map(key => {
+        const nameDay = groupByDay[key][0]['nameDay'];
+        const task = {
+          tasks: groupByDay[key],
+          nameDay: nameDay,
+          header: `${nameDay} (${groupByDay[key].length})`,
+        };
+        return task;
+      }
+      );
 
       return arrGroupByDay;
     })
