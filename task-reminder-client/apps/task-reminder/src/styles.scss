@@ -239,6 +239,22 @@ body {
   background: #cdcdce;
 }
 
+.nameTask .Today {
+  color: $task-reminder-todayTab;
+}
+
+.nameTask .Upcoming {
+  color: $task-reminder-upcomingTab;
+}
+
+.nameTask .Overdue {
+  color: $task-reminder-overdueTab;
+}
+
+.nameTask .Completed {
+  color: $task-reminder-completedTab;
+}
+
 @keyframes shake {
   0% {
     transform: rotate(35deg);
