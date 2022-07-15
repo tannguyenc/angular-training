@@ -1,12 +1,15 @@
 <div class="border-solid border-b border-inherit" *ngFor="let task of tasks">
   <div class="task-detail text-gray-500">
     <div class="mt-4 flex justify-between">
+      <div class="nameTask flex">
+        <i class="pi pi-circle-fill flex items-center float-right text-[.9rem] mb-2 mr-3" [ngClass]="task.nameDay"></i>
       <p class="name-task no-underline hover:underline font-bold cursor-pointer" (click)="openTaskDetail(task)">
         {{
           task.name.length > 30 ?
           task.name.substring(0, task.name.substring(0, 30).lastIndexOf(' ')) + ' ...' :
           task.name
         }}</p>
+      </div>
       <div class="flex">
         <!-- <p class="date flex items-center text-xs text-neutral-400 mr-2">{{task.dueDate | date:'short'}}</p>
         <i class="pi pi-circle-fill flex items-center float-right text-[0.5rem] mr-3" [ngClass]="task.nameDay === 'Overdue' ? 'text-red-600' :
