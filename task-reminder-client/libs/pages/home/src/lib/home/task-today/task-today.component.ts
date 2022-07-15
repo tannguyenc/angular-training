@@ -12,7 +12,7 @@ import { map } from 'rxjs';
 })
 export class TaskTodayComponent implements OnInit {
 
-  tasks$ = this.store.select(StateSelectors.getAllStateTodayStatus).pipe(
+  tasks$ = this.store.select(StateSelectors.getAllState).pipe(
     map(tasks => {
 
       const groupByDay = tasks.reduce((r, a) => {
