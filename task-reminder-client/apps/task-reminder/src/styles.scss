@@ -235,8 +235,8 @@ body {
   background: #cdcdce;
 }
 
-.p-menu .p-menuitem-link:not(.p-disabled):hover {
-  background: #cdcdce;
+.p-menu .p-menuitem-link-active:hover {
+  background: #cdcdce !important;
 }
 
 .nameTask .Today {
