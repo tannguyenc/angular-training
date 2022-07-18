@@ -12,9 +12,9 @@ import { map } from 'rxjs';
 })
 export class TasksComponent implements OnInit {
   activeTabs: boolean[] = [true, false, false];
-  tasks$ = this.store.select(StateSelectors.getAllStateNotCompleted).pipe(
+  tasks$ = this.store.select(StateSelectors.getAllState).pipe(
     map(tasks => {
-      const groupByDay = tasks.reduce((r, a) => {
+      const groupByDay = tasks.filter(t => !t.done).reduce((r, a) => {
         r[a.nameDay] = r[a.nameDay] || [];
         r[a.nameDay].push(a);
         return r;
@@ -25,6 +25,7 @@ export class TasksComponent implements OnInit {
         const task = {
           tasks: groupByDay[key],
           nameDay: nameDay,
+          header: `${nameDay} (${groupByDay[key].length})`,
           order: nameDay === 'Today' ? 0 :
             nameDay === 'Upcoming' ? 1 : 2
         };

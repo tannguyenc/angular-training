@@ -10,43 +10,38 @@ import { MenuItem } from 'primeng/api';
 export class LeftMenuComponent implements OnInit {
   items: MenuItem[] = [];
 
-   constructor(private router: Router,) {}
+  constructor(private router: Router,) { }
 
   ngOnInit() {
     this.items = [{
       label: 'All tasks',
       icon: 'pi pi-calendar-times',
-      command: () => {
-        this.router.navigate(['/home/all']);
-      }
+      routerLink: ['/home/all'],
+      routerLinkActiveOptions: { exact: true },
     },
     {
       label: 'Upcoming tasks',
       icon: 'pi pi-calendar-plus',
-      command: () => {
-        this.router.navigate(['/home/upcoming']);
-      }
+      routerLink: ['/home/upcoming'],
+      routerLinkActiveOptions: { exact: true },
     },
     {
       label: 'Today\'s tasks',
       icon: 'pi pi-calendar',
-      command: () => {
-        this.router.navigate(['/home/today']);
-      }
+      routerLink: ['/home/today'],
+      routerLinkActiveOptions: { exact: true },
     },
     {
       label: 'Overdue tasks',
       icon: 'pi pi-calendar-minus',
-      command: () => {
-        this.router.navigate(['/home/overdue']);
-      }
+      routerLink: ['/home/overdue'],
+      routerLinkActiveOptions: { exact: true },
     },
     {
       label: 'Completed tasks',
       icon: 'pi pi-check-square',
-      command: () => {
-        this.router.navigate(['/home/completed']);
-      }
+      routerLink: ['/home/completed'],
+      routerLinkActiveOptions: { exact: true },
     }
     ];
   }

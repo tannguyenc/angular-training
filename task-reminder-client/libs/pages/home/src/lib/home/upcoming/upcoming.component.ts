@@ -12,7 +12,7 @@ import { map } from 'rxjs';
 })
 export class UpcomingComponent implements OnInit {
   activeTabs: boolean[] = [true, false, false];
-  tasks$ = this.store.select(StateSelectors.getAllStateUpcomingStatus).pipe(
+  tasks$ = this.store.select(StateSelectors.getAllState).pipe(
     map(tasks => {
       const groupByDay = tasks.reduce((r, a) => {
         r[a.nameDay] = r[a.nameDay] || [];
@@ -24,7 +24,8 @@ export class UpcomingComponent implements OnInit {
         const nameDay = groupByDay[key][0]['nameDay'];
         const task = {
           tasks: groupByDay[key],
-          nameDay: nameDay
+          nameDay: nameDay,
+          header: `${nameDay} (${groupByDay[key].length})`,
         };
         return task;
       }

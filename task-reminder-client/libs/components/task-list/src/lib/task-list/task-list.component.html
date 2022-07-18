@@ -1,18 +1,33 @@
 <div class="border-solid border-b border-inherit" *ngFor="let task of tasks">
-  <div class="task-detail ml-3 text-gray-500">
-    <div class="mt-4 mr-4 flex justify-between">
-      <p class="name-task font-bold cursor-pointer" (click)="openTaskDetail(task)">{{task.name}}</p>
+  <div class="task-detail text-gray-500">
+    <div class="mt-4 flex justify-between">
+      <div class="nameTask flex">
+        <i class="pi pi-circle-fill flex items-center float-right text-[.9rem] mb-2 mr-3" [ngClass]="task.nameDay"></i>
+      <p class="name-task no-underline hover:underline font-bold cursor-pointer" (click)="openTaskDetail(task)">
+        {{
+          task.name.length > 30 ?
+          task.name.substring(0, task.name.substring(0, 30).lastIndexOf(' ')) + ' ...' :
+          task.name
+        }}</p>
+      </div>
       <div class="flex">
-        <p class="date flex items-center text-xs text-neutral-400 mr-2">{{task.dueDate | date:'short'}}</p>
+        <!-- <p class="date flex items-center text-xs text-neutral-400 mr-2">{{task.dueDate | date:'short'}}</p>
         <i class="pi pi-circle-fill flex items-center float-right text-[0.5rem] mr-3" [ngClass]="task.nameDay === 'Overdue' ? 'text-red-600' :
         (
           task.nameDay === 'Today' ? 'text-blue-600' : 'text-green-600'
-        )"></i>
+        )"></i> -->
+        <p-tag styleClass="mb-2" value="{{task.dueDate | date:'short'}}"></p-tag>
       </div>
     </div>
-    <div class="des-task mb-2 mr-4">
-      <p class="float-left text-xs">{{task.description}}</p>
-      <i class="pi pi-check  float-right text-xs font-bold mr-3 text-green-600 cursor-pointer"
+    <div class="des-task mb-2">
+      <p class="float-left text-xs w-9/12">
+        {{
+          task.description.length > 100 ?
+          task.description.substring(0, task.description.substring(0, 100).lastIndexOf(' ')) + ' ...' :
+          task.description
+        }}
+      </p>
+      <i class="pi pi-check  float-right text-xs font-bold text-green-600 cursor-pointer"
         *ngIf="task.done; else doneTask" (click)="isDone(task.id, false)" pTooltip="Mark as undone"></i>
 
       <div class="clear-both"></div>
@@ -20,8 +35,16 @@
   </div>
 
   <ng-template #doneTask>
-    <i class="pi pi-pencil float-right text-[0.6rem] font-bold mr-3 text-gray-600 cursor-pointer"
+    <i class="pi pi-pencil float-right text-[0.6rem] font-bold text-gray-600 cursor-pointer"
       (click)="isDone(task.id, true)" pTooltip="Mark as done"></i>
+  </ng-template>
+
+  <ng-template #todayTags>
+    <p-tag *ngIf="task.nameDay === 'Today'; else dayTags" styleClass="mb-2" value="{{task.dueDate | date:'short'}}"></p-tag>
+  </ng-template>
+
+  <ng-template #dayTags>
+    <p-tag styleClass="mb-2" severity="success" value="{{task.dueDate | date:'short'}}"></p-tag>
   </ng-template>
 </div>
 
