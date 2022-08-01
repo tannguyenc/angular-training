@@ -61,7 +61,8 @@ export class AddOrUpdateTaskComponent implements OnInit {
 
     const form = {
       ...this.taskForm.value,
-      dueDate: dueDateValue
+      dueDate: dueDateValue,
+      userId: this.getCurrentUserId()
     };
 
     if (this.taskForm.value?.id > 0) {
@@ -70,5 +71,14 @@ export class AddOrUpdateTaskComponent implements OnInit {
       this.store.dispatch(StateActions.AddTask({ task: form }));
     }
     this.ref.close();
+  }
+
+  getCurrentUserId() {
+    const userId = 0;
+    const userIdLocal = localStorage.getItem("userId");
+    if (userIdLocal !== null && userIdLocal) {
+      return +userIdLocal;
+    }
+    return userId;
   }
 }

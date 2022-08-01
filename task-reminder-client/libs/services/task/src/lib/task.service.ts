@@ -18,11 +18,13 @@ export class TaskService {
   constructor(
     private http: HttpClient,
     @Inject('BASE_API') private baseUrl: string
-    ) {
+  ) {
   }
 
   getListTask(status: TaskReminderStatus): Observable<ITaskReminderDetail[]> {
-    const url = `${this.baseUrl}api/TaskReminder?request=${status}`;
+
+    const userId = this.getCurrentUserId();
+    const url = `${this.baseUrl}api/TaskReminder?Status=${status}&UserId=${userId}`;
     return this.http.get<ITaskReminderDetail[]>(url, httpOptions);
   }
 
@@ -39,5 +41,14 @@ export class TaskService {
   updateTask(task: IAddTaskReminder): Observable<ITaskReminderDetail> {
     const url = `${this.baseUrl}api/TaskReminder/${task.id}`;
     return this.http.put<ITaskReminderDetail>(url, task, httpOptions);
+  }
+
+  getCurrentUserId() {
+    const userId = 0;
+    const userIdLocal = localStorage.getItem("userId");
+    if (userIdLocal !== null && userIdLocal) {
+      return +userIdLocal;
+    }
+    return userId;
   }
 }

@@ -11,6 +11,12 @@ namespace TaskReminderAPI.Models
         Upcoming = 40
     }
 
+    public class GetTaskReminderRequest
+    {
+        public TaskReminderStatus Status { get; set; }
+        public int UserId { get; set; }
+    }
+
     public class TaskReminderRequest
     {
         public TaskReminderStatus status { get; set; }
@@ -21,6 +27,7 @@ namespace TaskReminderAPI.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public DateTime DueDate { get; set; }
+        public int UserId { get; set; }
     }
 
     public class UpdateTaskReminderRequest

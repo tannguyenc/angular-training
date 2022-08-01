@@ -15,14 +15,14 @@ namespace TaskReminderAPI.Controllers
         public TaskReminderController(TaskReminderDbContext context) => _context = context;
 
         [HttpGet]
-        public async Task<List<TaskReminderDetailModel>> Get([FromQuery] TaskReminderStatus request)
+        public async Task<List<TaskReminderDetailModel>> Get([FromQuery] GetTaskReminderRequest request)
         {
             var results = new List<TaskReminderDetailModel>();
-            var datas = await _context.TaskReminders.Where(x => !x.Deleted && x.DueDate.HasValue).ToListAsync();
+            var datas = await _context.TaskReminders.Where(x => !x.Deleted && x.DueDate.HasValue && request.UserId == x.CreatedUserId).ToListAsync();
             if (datas.Any())
             {
                 var timeNow = DateTime.Now.Date;
-                switch (request)
+                switch (request.Status)
                 {
                     case TaskReminderStatus.All:
                         datas = datas.Where(x => !x.Done).ToList();
@@ -89,6 +89,7 @@ namespace TaskReminderAPI.Controllers
                 Done = false,
                 DueDate = task.DueDate.ToLocalTime(),
                 Name = task.Name,
+                CreatedUserId = task.UserId
             };
 
             await _context.TaskReminders.AddAsync(taskReminder);
