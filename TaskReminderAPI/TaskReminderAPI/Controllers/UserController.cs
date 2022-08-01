@@ -47,6 +47,38 @@ namespace TaskReminderAPI.Controllers
             return Ok();
         }
 
+        [HttpPost("changePassword")]
+        public async Task<IActionResult> ChangePass([FromBody] ChangePassRequest model)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == model.Email && !x.Deleted);
+            if (user is null)
+                return BadRequest("Email is incorrect");
+
+            if (model.NewPassword != model.ConfirmPassword)
+                return BadRequest("New Password and Confirm Password not correct");
+
+            var hashedPassword = new PasswordHasher<object?>().HashPassword(null, model.CurrentPassword);
+
+            var passwordVerificationResult = new PasswordHasher<object?>().VerifyHashedPassword(null, user.Password, model.CurrentPassword);
+            switch (passwordVerificationResult)
+            {
+                case PasswordVerificationResult.Failed:
+                    return BadRequest("Password incorrect.");
+
+                case PasswordVerificationResult.Success:
+                    var hashedNewPassword = new PasswordHasher<object?>().HashPassword(null, model.NewPassword);
+                    user.Password = hashedNewPassword;
+                    _context.Users.Update(user);
+                    await _context.SaveChangesAsync();
+                    return Ok();
+
+                case PasswordVerificationResult.SuccessRehashNeeded:
+                    return BadRequest("Password ok but should be rehashed and updated.");
+            }
+
+            return Ok();
+        }
+
         [HttpGet]
         public async Task<IEnumerable<User>> Get()
             => await _context.Users.Where(x => !x.Deleted).ToListAsync();

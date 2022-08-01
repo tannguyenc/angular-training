@@ -17,10 +17,12 @@ export class UserEffects {
       exhaustMap(({ email, password }) => this.userService.authenticate(email, password).pipe(
         tap((resp) => {
           localStorage.setItem('token', resp.token);
+          localStorage.setItem('userId', resp.id);
           this.router.navigate(['home']);
         }),
         map(resp => UserActions.loginSuccess({ token: resp.token })),
         catchError((error: HttpErrorResponse) => {
+          console.log(error);
           this.messageService.add({ severity: 'error', summary: 'Login failed', detail: error.error });
           return of(UserActions.loginFailure({ error }))
         })

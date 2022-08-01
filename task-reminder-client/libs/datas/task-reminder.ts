@@ -6,6 +6,11 @@ export enum TaskReminderStatus {
   Upcoming = 40
 }
 
+export interface GetTaskReminderRequest {
+  status: TaskReminderStatus;
+  userId: number;
+}
+
 export interface ITaskResponse {
   day: Date;
   nameDay: string;
@@ -34,4 +39,5 @@ export interface IAddTaskReminder {
   name: string;
   description: string;
   dueDate: Date;
+  userId: number;
 }
