@@ -47,6 +47,37 @@ namespace TaskReminderAPI.Controllers
             return Ok();
         }
 
+        [HttpPost("authorize/google")]
+        public async Task<IActionResult> AuthenticateWithGoogle([FromBody] AuthenticateWithGoogleRequest model)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == model.Email && !x.Deleted);
+            if (user is null)
+            {
+                user = new User
+                {
+                    AccessToken = model.AccessToken,
+                    Created = DateTime.Now,
+                    Deleted = false,
+                    Email = model.Email,
+                    FullName = model.Fullname,
+                    Password = new PasswordHasher<object?>().HashPassword(null, "abc@123"),
+                    PhotoUrl = model.PhotoUrl,
+                };
+                await _context.Users.AddAsync(user);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                user.AccessToken = model.AccessToken;
+                user.PhotoUrl = model.PhotoUrl;
+                user.FullName = model.Fullname;
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok(new AuthenticateResponse(user, $"{DateTime.Now:ddMMyyyy}12345"));
+        }
+
         [HttpPost("changePassword")]
         public async Task<IActionResult> ChangePass([FromBody] ChangePassRequest model)
         {

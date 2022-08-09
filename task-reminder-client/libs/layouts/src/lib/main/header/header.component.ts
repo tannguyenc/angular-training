@@ -4,6 +4,7 @@ import { Store } from '@ngrx/store';
 import * as StateSelectors from '@task-reminder-client/states/task';
 import * as StateActions from '@task-reminder-client/states/task';
 import { map } from 'rxjs';
+import { GoogleLoginProvider, SocialAuthService } from '@abacritt/angularx-social-login';
 
 @Component({
   selector: 'task-reminder-client-header',
@@ -22,13 +23,17 @@ export class HeaderComponent implements OnInit {
     }
   });
 
-  constructor(private router: Router, private store: Store) { }
+  avatarUrl = localStorage.getItem("photoUrl");
+
+  constructor(private router: Router, private store: Store, private readonly _authService: SocialAuthService) { }
 
   ngOnInit(): void { }
 
   logOut() {
     localStorage.removeItem('token');
     localStorage.setItem('userId', '0');
+    localStorage.setItem('photoUrl', '');
+    this._authService.signOut();
     this.router.navigate(['/login']);
   }
 }

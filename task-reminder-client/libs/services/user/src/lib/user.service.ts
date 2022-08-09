@@ -27,4 +27,14 @@ export class UserService {
       password
     }, httpOptions);
   }
+
+  authenticateWithGoogle(email: string, fullname: string, photoUrl: string, accessToken: string): Observable<IAuthenticate> {
+    const url = `${this.baseUrl}api/User/authorize/google`;
+    return this.http.post<IAuthenticate>(url, {
+      email,
+      fullname,
+      photoUrl,
+      accessToken
+    }, httpOptions);
+  }
 }

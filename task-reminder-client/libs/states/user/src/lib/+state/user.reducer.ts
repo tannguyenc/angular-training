@@ -30,15 +30,18 @@ export const initialState: State = userAdapter.getInitialState({
 const userReducer = createReducer(
   initialState,
   on(UserActions.login,
+    UserActions.loginWithGoogle,
     (state) => ({ ...state, loaded: false, error: null })
   ),
   on(UserActions.loginSuccess,
+    UserActions.loginWithGoogleSuccess,
     (state, { token }) => {
       const userId = token.split('-').pop();
       //localStorage.setItem('token', token);
       return { ...state, loaded: true, token, userId: userId }
     }),
   on(UserActions.loginFailure,
+    UserActions.loginWithGoogleFailure,
     (state, { error }) => ({ ...state, error, loaded: true }))
 );
 

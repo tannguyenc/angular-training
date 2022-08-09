@@ -1,4 +1,4 @@
-<div class="task-list ml-0 mt-0 shadow-xl">
+<div *ngIf="(loading$ | async) === true" class="task-list ml-0 mt-0 shadow-xl">
   <p-accordion>
     <div class="tasks-one-day" *ngFor="let task of (tasks$ | async) || []">
       <p-accordionTab *ngFor="let task of (tasks$ | async) || []; let i = index" header="{{task.header}}"
@@ -8,4 +8,7 @@
       </p-accordionTab>
     </div>
   </p-accordion>
+</div>
+<div class="h-full flex items-center justify-center">
+  <p-progressSpinner  *ngIf="(loading$ | async) === false"></p-progressSpinner>
 </div>

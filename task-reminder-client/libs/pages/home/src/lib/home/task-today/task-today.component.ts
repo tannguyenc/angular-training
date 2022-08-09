@@ -11,7 +11,7 @@ import { map } from 'rxjs';
   styleUrls: ['./task-today.component.scss'],
 })
 export class TaskTodayComponent implements OnInit {
-
+  loading$ = this.store.select(StateSelectors.getStateLoaded);
   tasks$ = this.store.select(StateSelectors.getAllState).pipe(
     map(tasks => {
 

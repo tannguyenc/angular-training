@@ -1,4 +1,4 @@
-import { createAction, props } from '@ngrx/store';
+import { createAction, props, Store } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 export const login = createAction(
@@ -13,5 +13,20 @@ export const loginSuccess = createAction(
 
 export const loginFailure = createAction(
   '[User/API] Login failure',
+  props<{ error: HttpErrorResponse }>()
+);
+
+export const loginWithGoogle = createAction(
+  '[User/API] Login With Google',
+  props<{ email: string, fullname: string, photoUrl: string, accessToken: string }>()
+);
+
+export const loginWithGoogleSuccess = createAction(
+  '[User/API] Login With Google success',
+  props<{ token: string }>()
+);
+
+export const loginWithGoogleFailure = createAction(
+  '[User/API] Login With Google failure',
   props<{ error: HttpErrorResponse }>()
 );

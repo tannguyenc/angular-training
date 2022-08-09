@@ -24,6 +24,7 @@ import { DatePipe } from '@angular/common';
 import { AccordionModule } from 'primeng/accordion';
 import { CompletedComponent } from './home/completed/completed.component';
 import { UpcomingComponent } from './home/upcoming/upcoming.component';
+import {ProgressSpinnerModule} from 'primeng/progressspinner';
 
 @NgModule({
   imports: [
@@ -42,6 +43,8 @@ import { UpcomingComponent } from './home/upcoming/upcoming.component';
     ToastModule,
     ReactiveFormsModule,
     AccordionModule,
+    ProgressSpinnerModule,
+
   ],
   declarations: [
     HomeComponent,

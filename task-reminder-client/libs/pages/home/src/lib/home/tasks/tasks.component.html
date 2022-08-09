@@ -1,4 +1,4 @@
-<div class="task-list ml-0 mt-0 shadow-xl">
+<div *ngIf="(loading$ | async) === true" class="task-list ml-0 mt-0 shadow-xl">
   <p-accordion [multiple]="true" (onClose)="onTabClose($event)" (onOpen)="onTabOpen($event)">
     <p-accordionTab *ngFor="let task of (tasks$ | async) || []; let i = index" header="{{task.header}}"
       [selected]="activeTabs[i]" [ngClass]="task.nameDay === 'Overdue' ? 'overdueTab' :
@@ -9,4 +9,7 @@
       </task-reminder-client-task-list>
     </p-accordionTab>
   </p-accordion>
+</div>
+<div class="h-full flex items-center justify-center">
+  <p-progressSpinner  *ngIf="(loading$ | async) === false"></p-progressSpinner>
 </div>

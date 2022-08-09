@@ -11,6 +11,18 @@ namespace TaskReminderAPI.Models
         public string Password { get; set; }
     }
 
+    public class AuthenticateWithGoogleRequest
+    {
+        [Required]
+        public string Email { get; set; }
+
+        public string Fullname { get; set; }
+
+        public string PhotoUrl { get; set; }
+
+        public string AccessToken { get; set; }
+    }
+
     public class ChangePassRequest
     {
         [Required]
