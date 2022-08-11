@@ -27,7 +27,8 @@ const defaultInitOptions: GoogleInitOptions = {
   //   'https://www.googleapis.com/auth/calendar.settings.readonly',]
   scopes: [
     'https://www.googleapis.com/auth/tasks',
-    'https://www.googleapis.com/auth/tasks.readonly',]
+    'https://www.googleapis.com/auth/tasks.readonly',],
+    oneTapEnabled: false
 };
 
 @NgModule({

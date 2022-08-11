@@ -137,6 +137,7 @@ namespace TaskReminderAPI.Controllers
         public async Task<IActionResult> Create(User user)
         {
             user.Deleted = false;
+            user.PhotoUrl = "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/default-avatar.png";
             var hashedPassword = new PasswordHasher<object?>().HashPassword(null, user.Password);
             user.Password = hashedPassword;
             await _context.Users.AddAsync(user);

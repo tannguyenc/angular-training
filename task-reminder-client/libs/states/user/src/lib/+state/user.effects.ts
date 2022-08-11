@@ -18,7 +18,7 @@ export class UserEffects {
         tap((resp) => {
           localStorage.setItem('token', resp.token);
           localStorage.setItem('userId', resp.id);
-
+          localStorage.setItem('photoUrl', resp.photoUrl);
           this.router.navigate(['home']);
         }),
         map(resp => UserActions.loginSuccess({ token: resp.token })),

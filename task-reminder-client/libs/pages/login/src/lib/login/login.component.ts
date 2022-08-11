@@ -33,21 +33,14 @@ export class LoginComponent implements OnDestroy, OnInit {
   }
 
   ngOnInit(): void {
-    this.socialAuthService.authState.subscribe((user) => {
-      this.user = user;
-      console.log(this.user);
-      if (this.user) {
-        console.log('isuser');
-        console.log(this.user);
+    this.socialAuthService.authState.subscribe((user: SocialUser) => {
+      if (user) {
         this.socialAuthService.getAccessToken(GoogleLoginProvider.PROVIDER_ID)
-          .then(accessToken => {
-            console.log(accessToken);
+          .then((accessToken: string) => {
             if (accessToken) {
-              console.log('istoken');
               this.store.dispatch(UserActions.loginWithGoogle({ email: user.email, fullname: user.name, photoUrl: user.photoUrl, accessToken: accessToken }));
             }
           });
-
       }
     });
   }
