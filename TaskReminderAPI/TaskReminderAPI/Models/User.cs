@@ -11,5 +11,7 @@ namespace TaskReminderAPI.Models
         public string Password { get; set; }
         public DateTime Created { get; set; }
         public bool Deleted { get; set; }
+        public string PhotoUrl { get; set; }
+        public string AccessToken { get; set; }
     }
 }

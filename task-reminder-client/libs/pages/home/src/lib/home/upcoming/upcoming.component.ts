@@ -12,6 +12,7 @@ import { map } from 'rxjs';
 })
 export class UpcomingComponent implements OnInit {
   activeTabs: boolean[] = [true, false, false];
+  loading$ = this.store.select(StateSelectors.getStateLoaded);
   tasks$ = this.store.select(StateSelectors.getAllState).pipe(
     map(tasks => {
       const groupByDay = tasks.reduce((r, a) => {

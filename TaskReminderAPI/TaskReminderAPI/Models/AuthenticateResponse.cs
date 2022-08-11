@@ -9,6 +9,7 @@ namespace TaskReminderAPI.Models
         public string Email { get; set; }
         public bool Deleted { get; set; }
         public string Token { get; set; }
+        public string PhotoUrl { get; set; }
 
         public AuthenticateResponse(User user, string token)
         {
@@ -17,6 +18,7 @@ namespace TaskReminderAPI.Models
             Deleted = user.Deleted;
             FullName = user.FullName;
             Token = token;
+            PhotoUrl = user.PhotoUrl;
         }
     }
 }

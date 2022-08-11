@@ -11,7 +11,7 @@ import { map } from 'rxjs';
   styleUrls: ['./completed.component.scss'],
 })
 export class CompletedComponent implements OnInit {
-
+  loading$ = this.store.select(StateSelectors.getStateLoaded);
   tasks$ = this.store.select(StateSelectors.getAllState).pipe(
     map(tasks => {
 
@@ -31,7 +31,6 @@ export class CompletedComponent implements OnInit {
         return task;
       }
       );
-console.log(arrGroupByDay);
       return arrGroupByDay;
     })
   )

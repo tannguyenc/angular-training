@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import * as UserActions from '@task-reminder-client/states/user';
+import { SocialAuthService, GoogleLoginProvider, SocialUser } from '@abacritt/angularx-social-login';
 
 @Component({
   selector: 'task-reminder-client-login',
@@ -17,19 +18,31 @@ export class LoginComponent implements OnDestroy, OnInit {
     password: ['', Validators.required]
   });
 
+  user: SocialUser | undefined;
+
   private _sub: Subscription = new Subscription();
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private store: Store
+    private store: Store,
+    private socialAuthService: SocialAuthService,
   ) {
 
   }
 
   ngOnInit(): void {
-    //localStorage.removeItem('token');
+    this.socialAuthService.authState.subscribe((user: SocialUser) => {
+      if (user) {
+        this.socialAuthService.getAccessToken(GoogleLoginProvider.PROVIDER_ID)
+          .then((accessToken: string) => {
+            if (accessToken) {
+              this.store.dispatch(UserActions.loginWithGoogle({ email: user.email, fullname: user.name, photoUrl: user.photoUrl, accessToken: accessToken }));
+            }
+          });
+      }
+    });
   }
 
   login() {

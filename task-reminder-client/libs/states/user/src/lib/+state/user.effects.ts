@@ -18,13 +18,32 @@ export class UserEffects {
         tap((resp) => {
           localStorage.setItem('token', resp.token);
           localStorage.setItem('userId', resp.id);
+          localStorage.setItem('photoUrl', resp.photoUrl);
           this.router.navigate(['home']);
         }),
         map(resp => UserActions.loginSuccess({ token: resp.token })),
         catchError((error: HttpErrorResponse) => {
-          console.log(error);
           this.messageService.add({ severity: 'error', summary: 'Login failed', detail: error.error });
           return of(UserActions.loginFailure({ error }))
+        })
+      ))
+    )
+  );
+
+  loginWithGoogle$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UserActions.loginWithGoogle),
+      exhaustMap(({ email, fullname, photoUrl, accessToken }) => this.userService.authenticateWithGoogle(email, fullname, photoUrl, accessToken).pipe(
+        tap((resp) => {
+          localStorage.setItem('token', resp.token);
+          localStorage.setItem('userId', resp.id);
+          localStorage.setItem('photoUrl', resp.photoUrl);
+          this.router.navigate(['home']);
+        }),
+        map(resp => UserActions.loginWithGoogleSuccess({ token: resp.token })),
+        catchError((error: HttpErrorResponse) => {
+          this.messageService.add({ severity: 'error', summary: 'Login failed', detail: error.error });
+          return of(UserActions.loginWithGoogleFailure({ error }))
         })
       ))
     )

@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
+using System.Text.Json;
 using TaskReminderAPI.Data;
 using TaskReminderAPI.Models;
 
@@ -18,7 +20,13 @@ namespace TaskReminderAPI.Controllers
         public async Task<List<TaskReminderDetailModel>> Get([FromQuery] GetTaskReminderRequest request)
         {
             var results = new List<TaskReminderDetailModel>();
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId);
+            if (user == null)
+                return results;
             var datas = await _context.TaskReminders.Where(x => !x.Deleted && x.DueDate.HasValue && request.UserId == x.CreatedUserId).ToListAsync();
+            //var events = await GetEventGoogleCalendarAsync(user, datas.Count + 1);
+            var tasks = await GetGoogleCalendarTasksAsync(user, datas.Count);
+            datas.AddRange(tasks);
             if (datas.Any())
             {
                 var timeNow = DateTime.Now.Date;
@@ -185,6 +193,187 @@ namespace TaskReminderAPI.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        private async Task<List<TaskReminder>> GetEventGoogleCalendarAsync(User user, int totalTask)
+        {
+            var results = new List<TaskReminder>();
+
+            using (var client = new HttpClient())
+            {
+                var events = new GoogleCalendarEvents();
+                //set request
+                var request = new HttpRequestMessage(HttpMethod.Get, "https://www.googleapis.com/calendar/v3/calendars/primary/events?maxResults=10" +
+                    "&orderBy=startTime&singleEvents=true&timeMin=2022-08-05T04:52:05.504Z&key=AIzaSyCNGPlz9EvS0yU2BdT_3pLpTm58zDc0Vec");
+                //set Header
+                request.Headers.Authorization = new AuthenticationHeaderValue(
+                    "Bearer", user.AccessToken);
+                //get response
+                var response = await client.SendAsync(request);
+
+                response.EnsureSuccessStatusCode();
+
+                var responseStream = await response.Content.ReadAsStringAsync();
+                if(!string.IsNullOrEmpty( responseStream))
+                {
+                    events = JsonConvert.DeserializeObject<GoogleCalendarEvents>(responseStream);
+                }
+                
+                if(events!= null && events.items.Any())
+                {
+                    Random rnd = new Random();
+
+                    for(var i = 0; i < events.items.Count; i++)
+                    {
+                        var x = events.items[i];
+
+                        results.Add(new TaskReminder
+                        {
+                            Created = x.created,
+                            Deleted = false,
+                            Description = "demo",
+                            Done = false,
+                            DueDate = x.start.dateTime,
+                            Name = x.summary,
+                            CreatedUserId = user.Id,
+                            Id = i + totalTask
+                        }) ;
+                    }
+
+                    //results = events.items.Select(x=> new TaskReminder
+                    //{
+                    //    Created = x.created,
+                    //    Deleted = false,
+                    //    Description = x.description,
+                    //    Done = false,
+                    //    DueDate = x.start.dateTime,
+                    //    Name = x.summary,
+                    //    CreatedUserId = user.Id,
+                    //    Id = rnd
+                    //}).ToList();
+                }
+            }
+
+            return results;
+        }
+
+        private async Task<List<TaskReminder>> GetGoogleCalendarTasksAsync(User user, int totalTask)
+        {
+            var results = new List<TaskReminder>();
+            var idTask = totalTask++;
+            try
+            {
+                var taskLists = await GetGoogleCalendarTaskListAsync(user);
+                if (taskLists.Any())
+                {
+                    using (var client = new HttpClient())
+                    {
+                        foreach (var taskList in taskLists)
+                        {
+                            var tasks = new GoogleCalendarTasks();
+                            //set request
+                            var request = new HttpRequestMessage(HttpMethod.Get, $"https://tasks.googleapis.com/tasks/v1/lists/{taskList.id}/tasks" +
+                                "?maxResults=50&showCompleted=true&showHidden=true&key=AIzaSyCNGPlz9EvS0yU2BdT_3pLpTm58zDc0Vec");
+
+                            //set Header
+                            request.Headers.Authorization = new AuthenticationHeaderValue(
+                                "Bearer", user.AccessToken);
+                            //get response
+                            var response = await client.SendAsync(request);
+
+                            response.EnsureSuccessStatusCode();
+
+                            var responseStream = await response.Content.ReadAsStringAsync();
+                            if (!string.IsNullOrEmpty(responseStream))
+                            {
+                                tasks = JsonConvert.DeserializeObject<GoogleCalendarTasks>(responseStream);
+                            }
+
+                            if (tasks != null && tasks.items.Any())
+                            {
+                                for (var i = 0; i < tasks.items.Count; i++)
+                                {
+                                    var x = tasks.items[i];
+
+                                    results.Add(new TaskReminder
+                                    {
+                                        Created = x.updated,
+                                        Deleted = false,
+                                        Description = x.notes,
+                                        Done = x.status == "completed",
+                                        DueDate = x.due,
+                                        Name = x.title,
+                                        CreatedUserId = user.Id,
+                                        Id = idTask++
+                                    });
+                                }
+
+                                //results = events.items.Select(x=> new TaskReminder
+                                //{
+                                //    Created = x.created,
+                                //    Deleted = false,
+                                //    Description = x.description,
+                                //    Done = false,
+                                //    DueDate = x.start.dateTime,
+                                //    Name = x.summary,
+                                //    CreatedUserId = user.Id,
+                                //    Id = rnd
+                                //}).ToList();
+                            }
+                        }
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                results = new List<TaskReminder>();
+            }
+
+            return results;
+        }
+
+        private async Task<List<GoogleCalendarTaskListItem>> GetGoogleCalendarTaskListAsync(User user)
+        {
+            var result = new List<GoogleCalendarTaskListItem>();
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    var taskList = new GoogleCalendarTaskList();
+                    //set request
+                    var request = new HttpRequestMessage(HttpMethod.Get, "https://tasks.googleapis.com/tasks/v1/users/@me/lists?key=AIzaSyCNGPlz9EvS0yU2BdT_3pLpTm58zDc0Vec");
+                    //set Header
+                    request.Headers.Authorization = new AuthenticationHeaderValue(
+                        "Bearer", user.AccessToken);
+                    //get response
+                    var response = await client.SendAsync(request);
+
+                    response.EnsureSuccessStatusCode();
+
+                    var responseStream = await response.Content.ReadAsStringAsync();
+                    if (!string.IsNullOrEmpty(responseStream))
+                    {
+                        taskList = JsonConvert.DeserializeObject<GoogleCalendarTaskList>(responseStream);
+                    }
+
+                    if (taskList != null && taskList.items.Any())
+                    {
+                        result = taskList.items.Select(x => new GoogleCalendarTaskListItem
+                        {
+                            id = x.id,
+                            title = x.title,
+                        }).ToList();
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                result = new List<GoogleCalendarTaskListItem>();
+            }
+            
+
+            return result;
         }
     }
 }

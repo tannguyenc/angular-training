@@ -7,6 +7,10 @@ import { StatesUserModule } from '@task-reminder-client/states/user';
 import { MessageService } from 'primeng/api';
 import {ToastModule} from 'primeng/toast';
 
+import {
+  SocialLoginModule,
+} from '@abacritt/angularx-social-login';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -14,7 +18,8 @@ import {ToastModule} from 'primeng/toast';
     ReactiveFormsModule,
     PageLoginRoutes,
     StatesUserModule,
-    ToastModule
+    ToastModule,
+    SocialLoginModule
   ],
   declarations: [LoginComponent],
   exports: [

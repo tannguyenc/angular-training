@@ -28,7 +28,12 @@ export const initialState: State = stateAdapter.getInitialState({
 
 const stateReducer = createReducer(
   initialState,
-  on(StateActions.init, (state) => ({ ...state, loaded: false, isSuccess: false, error: null })),
+  on(StateActions.init,
+    StateActions.allTask,
+    StateActions.updateDoneTask,
+    StateActions.AddTask,
+    StateActions.UpdateTask,
+     (state) => ({ ...state, loaded: false, isSuccess: false, error: null })),
   on(StateActions.loadStateFailure,
     StateActions.allTaskFailure,
     StateActions.updateDoneTaskFailure,

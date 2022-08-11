@@ -3,4 +3,5 @@ export interface IAuthenticate {
   email: string;
   fullName: string;
   token: string;
+  photoUrl: string;
 }
