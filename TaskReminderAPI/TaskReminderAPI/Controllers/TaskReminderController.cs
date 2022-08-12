@@ -23,7 +23,20 @@ namespace TaskReminderAPI.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId);
             if (user == null)
                 return results;
-            var datas = await _context.TaskReminders.Where(x => !x.Deleted && x.DueDate.HasValue && request.UserId == x.CreatedUserId).ToListAsync();
+            var resp = await _context.TaskReminders.Where(x => !x.Deleted && x.DueDate.HasValue && request.UserId == x.CreatedUserId).ToListAsync();
+            var datas = resp.Select(x => new TaskReminderResponse
+            {
+                Id = x.Id,
+                DueDate = x.DueDate,
+                Created = x.Created,
+                CreatedUserId = x.CreatedUserId,
+                Deleted = x.Deleted,
+                Description = x.Description,
+                Done = x.Done,
+                IsGoogleTask = false,
+                Name = x.Name
+            }).ToList();
+
             //var events = await GetEventGoogleCalendarAsync(user, datas.Count + 1);
             var tasks = await GetGoogleCalendarTasksAsync(user, datas.Count);
             datas.AddRange(tasks);
@@ -51,6 +64,7 @@ namespace TaskReminderAPI.Controllers
 
                 results = datas.OrderBy(x => x.DueDate).Select(x => new TaskReminderDetailModel
                 {
+                    IsGoogleTask = x.IsGoogleTask,
                     Created = x.Created,
                     Deleted = x.Deleted,
                     Description = x.Description,
@@ -257,9 +271,9 @@ namespace TaskReminderAPI.Controllers
             return results;
         }
 
-        private async Task<List<TaskReminder>> GetGoogleCalendarTasksAsync(User user, int totalTask)
+        private async Task<List<TaskReminderResponse>> GetGoogleCalendarTasksAsync(User user, int totalTask)
         {
-            var results = new List<TaskReminder>();
+            var results = new List<TaskReminderResponse>();
             var idTask = totalTask++;
             try
             {
@@ -295,7 +309,7 @@ namespace TaskReminderAPI.Controllers
                                 {
                                     var x = tasks.items[i];
 
-                                    results.Add(new TaskReminder
+                                    results.Add(new TaskReminderResponse
                                     {
                                         Created = x.updated,
                                         Deleted = false,
@@ -304,7 +318,8 @@ namespace TaskReminderAPI.Controllers
                                         DueDate = x.due,
                                         Name = x.title,
                                         CreatedUserId = user.Id,
-                                        Id = idTask++
+                                        Id = idTask++,
+                                        IsGoogleTask = true
                                     });
                                 }
 
@@ -326,7 +341,7 @@ namespace TaskReminderAPI.Controllers
             }
             catch(Exception ex)
             {
-                results = new List<TaskReminder>();
+                results = new List<TaskReminderResponse>();
             }
 
             return results;

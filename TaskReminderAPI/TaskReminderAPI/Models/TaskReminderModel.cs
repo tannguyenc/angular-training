@@ -24,6 +24,7 @@ namespace TaskReminderAPI.Models
         public DateTime DueDate { get; set; }
         public bool Done { get; set; }
         public bool Deleted { get; set; }
+        public bool IsGoogleTask { get; set; }
     }
 
     public class GoogleCalendarEvents
