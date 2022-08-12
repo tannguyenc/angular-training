@@ -103,34 +103,40 @@ namespace TaskReminderAPI.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> Create(AddTaskReminderRequest task)
         {
-            var taskReminder = new TaskReminder
+            if(task.IsGoogleTask)
             {
-                Created = DateTime.Now,
-                Deleted = false,
-                Description = task.Description,
-                Done = false,
-                DueDate = task.DueDate.ToLocalTime(),
-                Name = task.Name,
-                CreatedUserId = task.UserId
-            };
 
-            await _context.TaskReminders.AddAsync(taskReminder);
-            await _context.SaveChangesAsync();
-            var timeNow = DateTime.Now.Date;
-
-            return Ok(new TaskReminderDetailModel
+            }else
             {
-                Created = taskReminder.Created,
-                Deleted = taskReminder.Deleted,
-                Description = taskReminder.Description,
-                Done = taskReminder.Done,
-                DueDate = taskReminder.DueDate.Value,
-                Id = taskReminder.Id,
-                Name = taskReminder.Name,
-                NameDay = taskReminder.Done ? TaskReminderStatus.Completed.ToString() : taskReminder.DueDate.Value.Date < timeNow ?
-                    TaskReminderStatus.Overdue.ToString() : taskReminder.DueDate.Value.Date == timeNow ?
-                    TaskReminderStatus.Today.ToString() : TaskReminderStatus.Upcoming.ToString()
-            });
+                var taskReminder = new TaskReminder
+                {
+                    Created = DateTime.Now,
+                    Deleted = false,
+                    Description = task.Description,
+                    Done = false,
+                    DueDate = task.DueDate.ToLocalTime(),
+                    Name = task.Name,
+                    CreatedUserId = task.UserId
+                };
+
+                await _context.TaskReminders.AddAsync(taskReminder);
+                await _context.SaveChangesAsync();
+                var timeNow = DateTime.Now.Date;
+
+                return Ok(new TaskReminderDetailModel
+                {
+                    Created = taskReminder.Created,
+                    Deleted = taskReminder.Deleted,
+                    Description = taskReminder.Description,
+                    Done = taskReminder.Done,
+                    DueDate = taskReminder.DueDate.Value,
+                    Id = taskReminder.Id,
+                    Name = taskReminder.Name,
+                    NameDay = taskReminder.Done ? TaskReminderStatus.Completed.ToString() : taskReminder.DueDate.Value.Date < timeNow ?
+                        TaskReminderStatus.Overdue.ToString() : taskReminder.DueDate.Value.Date == timeNow ?
+                        TaskReminderStatus.Today.ToString() : TaskReminderStatus.Upcoming.ToString()
+                });
+            }
 
             //return CreatedAtAction(nameof(GetById), new { id = taskReminder.Id }, taskReminder);
         }
