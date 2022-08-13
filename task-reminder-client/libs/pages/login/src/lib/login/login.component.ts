@@ -70,7 +70,7 @@ export class LoginComponent implements OnDestroy, OnInit, AfterViewInit {
     });
     google.accounts.id.renderButton(
       document.getElementById("buttonDiv"),
-      { size: "large", shape: "pill" }  // customization attributes
+      { size: "large", shape: "pill", logo_alignment: "left" }  // customization attributes
     );
   }
 

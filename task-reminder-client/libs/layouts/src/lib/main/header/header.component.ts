@@ -4,6 +4,8 @@ import { Store } from '@ngrx/store';
 import * as StateSelectors from '@task-reminder-client/states/task';
 import * as StateActions from '@task-reminder-client/states/task';
 
+declare let google: any;
+
 @Component({
   selector: 'task-reminder-client-header',
   templateUrl: './header.component.html',
@@ -31,6 +33,7 @@ export class HeaderComponent implements OnInit {
     localStorage.removeItem('token');
     localStorage.setItem('userId', '0');
     localStorage.setItem('photoUrl', '');
+    google.accounts.id.disableAutoSelect();
     this.router.navigate(['/login']);
   }
 }
