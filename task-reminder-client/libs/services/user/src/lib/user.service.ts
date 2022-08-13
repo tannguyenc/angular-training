@@ -37,4 +37,9 @@ export class UserService {
       accessToken
     }, httpOptions);
   }
+
+  checkCallOAuthGoogle(email: string): Observable<boolean> {
+    const url = `${this.baseUrl}api/User/checkCallOAuthGoogle/${email}`;
+    return this.http.get<boolean>(url, httpOptions);
+  }
 }

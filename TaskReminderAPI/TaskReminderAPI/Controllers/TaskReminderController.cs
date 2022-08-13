@@ -23,7 +23,20 @@ namespace TaskReminderAPI.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId);
             if (user == null)
                 return results;
-            var datas = await _context.TaskReminders.Where(x => !x.Deleted && x.DueDate.HasValue && request.UserId == x.CreatedUserId).ToListAsync();
+            var resp = await _context.TaskReminders.Where(x => !x.Deleted && x.DueDate.HasValue && request.UserId == x.CreatedUserId).ToListAsync();
+            var datas = resp.Select(x => new TaskReminderResponse
+            {
+                Id = x.Id,
+                DueDate = x.DueDate,
+                Created = x.Created,
+                CreatedUserId = x.CreatedUserId,
+                Deleted = x.Deleted,
+                Description = x.Description,
+                Done = x.Done,
+                IsGoogleTask = false,
+                Name = x.Name
+            }).ToList();
+
             //var events = await GetEventGoogleCalendarAsync(user, datas.Count + 1);
             var tasks = await GetGoogleCalendarTasksAsync(user, datas.Count);
             datas.AddRange(tasks);
@@ -51,6 +64,7 @@ namespace TaskReminderAPI.Controllers
 
                 results = datas.OrderBy(x => x.DueDate).Select(x => new TaskReminderDetailModel
                 {
+                    IsGoogleTask = x.IsGoogleTask,
                     Created = x.Created,
                     Deleted = x.Deleted,
                     Description = x.Description,
@@ -207,7 +221,7 @@ namespace TaskReminderAPI.Controllers
                     "&orderBy=startTime&singleEvents=true&timeMin=2022-08-05T04:52:05.504Z&key=AIzaSyCNGPlz9EvS0yU2BdT_3pLpTm58zDc0Vec");
                 //set Header
                 request.Headers.Authorization = new AuthenticationHeaderValue(
-                    "Bearer", user.AccessToken);
+                    "Bearer", user.AccessTokenGoogle);
                 //get response
                 var response = await client.SendAsync(request);
 
@@ -257,10 +271,25 @@ namespace TaskReminderAPI.Controllers
             return results;
         }
 
-        private async Task<List<TaskReminder>> GetGoogleCalendarTasksAsync(User user, int totalTask)
+        private async Task<List<TaskReminderResponse>> GetGoogleCalendarTasksAsync(User user, int totalTask)
         {
-            var results = new List<TaskReminder>();
+            var results = new List<TaskReminderResponse>();
             var idTask = totalTask++;
+            var accessTokenGoogle = user.AccessTokenGoogle;
+
+            if (!string.IsNullOrEmpty(user.RefreshTokenGoogle) && user.ExpiresInGoogle <= DateTime.Now)
+            {
+                var newToken = await GoogleAccessTokenFromRefreshToken(user.RefreshTokenGoogle);
+                if (newToken != null && !string.IsNullOrEmpty(newToken.access_token) && newToken.expires_in > 0)
+                {
+                    user.ExpiresInGoogle = DateTime.Now.AddSeconds(newToken.expires_in);
+                    user.AccessTokenGoogle = newToken.access_token;
+                    accessTokenGoogle = newToken.access_token;
+                    _context.Users.Update(user);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
             try
             {
                 var taskLists = await GetGoogleCalendarTaskListAsync(user);
@@ -277,7 +306,7 @@ namespace TaskReminderAPI.Controllers
 
                             //set Header
                             request.Headers.Authorization = new AuthenticationHeaderValue(
-                                "Bearer", user.AccessToken);
+                                "Bearer", accessTokenGoogle);
                             //get response
                             var response = await client.SendAsync(request);
 
@@ -295,7 +324,7 @@ namespace TaskReminderAPI.Controllers
                                 {
                                     var x = tasks.items[i];
 
-                                    results.Add(new TaskReminder
+                                    results.Add(new TaskReminderResponse
                                     {
                                         Created = x.updated,
                                         Deleted = false,
@@ -304,7 +333,8 @@ namespace TaskReminderAPI.Controllers
                                         DueDate = x.due,
                                         Name = x.title,
                                         CreatedUserId = user.Id,
-                                        Id = idTask++
+                                        Id = idTask++,
+                                        IsGoogleTask = true
                                     });
                                 }
 
@@ -326,7 +356,7 @@ namespace TaskReminderAPI.Controllers
             }
             catch(Exception ex)
             {
-                results = new List<TaskReminder>();
+                results = new List<TaskReminderResponse>();
             }
 
             return results;
@@ -335,6 +365,21 @@ namespace TaskReminderAPI.Controllers
         private async Task<List<GoogleCalendarTaskListItem>> GetGoogleCalendarTaskListAsync(User user)
         {
             var result = new List<GoogleCalendarTaskListItem>();
+
+            var accessTokenGoogle = user.AccessTokenGoogle;
+
+            if (!string.IsNullOrEmpty(user.RefreshTokenGoogle) && user.ExpiresInGoogle <= DateTime.Now)
+            {
+                var newToken = await GoogleAccessTokenFromRefreshToken(user.RefreshTokenGoogle);
+                if (newToken != null && !string.IsNullOrEmpty(newToken.access_token) && newToken.expires_in > 0)
+                {
+                    user.ExpiresInGoogle = DateTime.Now.AddSeconds(newToken.expires_in);
+                    user.AccessTokenGoogle = newToken.access_token;
+                    accessTokenGoogle = newToken.access_token;
+                    _context.Users.Update(user);
+                    await _context.SaveChangesAsync();
+                }
+            }
 
             try
             {
@@ -345,7 +390,7 @@ namespace TaskReminderAPI.Controllers
                     var request = new HttpRequestMessage(HttpMethod.Get, "https://tasks.googleapis.com/tasks/v1/users/@me/lists?key=AIzaSyCNGPlz9EvS0yU2BdT_3pLpTm58zDc0Vec");
                     //set Header
                     request.Headers.Authorization = new AuthenticationHeaderValue(
-                        "Bearer", user.AccessToken);
+                        "Bearer", accessTokenGoogle);
                     //get response
                     var response = await client.SendAsync(request);
 
@@ -372,6 +417,56 @@ namespace TaskReminderAPI.Controllers
                 result = new List<GoogleCalendarTaskListItem>();
             }
             
+
+            return result;
+        }
+
+        private async Task<GoogleAuthorizationCode> GoogleAccessTokenFromRefreshToken(string refreshToken)
+        {
+            var result = new GoogleAuthorizationCode
+            {
+                refresh_token = refreshToken,
+            };
+
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"https://oauth2.googleapis.com/token"))
+                    {
+                        var json = JsonConvert.SerializeObject(new
+                        {
+                            refresh_token = refreshToken,
+                            client_id = "563919799549-l37pui6624jnr4j39n20aqvg83jvk54b.apps.googleusercontent.com",
+                            client_secret = "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",
+                            grant_type = "refresh_token",
+                            redirect_uri = "http://localhost:4200"
+                        });
+                        request.Content = new StringContent(json);
+                        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                        var response = await httpClient.SendAsync(request);
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            // Get the response
+                            var customerJsonString = await response.Content.ReadAsStringAsync();
+
+                            // Deserialise the data (include the Newtonsoft JSON Nuget package if you don't already have it)
+                            var deserialized = JsonConvert.DeserializeObject<GoogleAuthorizationCode>(custome‌​rJsonString);
+                            if (deserialized != null && !string.IsNullOrEmpty(deserialized.access_token))
+                            {
+                                result = deserialized;
+                                result.refresh_token = refreshToken;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result = new GoogleAuthorizationCode();
+            }
 
             return result;
         }

@@ -3,12 +3,13 @@
     <div class="mt-4 flex justify-between">
       <div class="nameTask flex">
         <i class="pi pi-circle-fill flex items-center float-right text-[.9rem] mb-2 mr-3" [ngClass]="task.nameDay"></i>
-      <p class="name-task no-underline hover:underline font-bold cursor-pointer" (click)="openTaskDetail(task)">
-        {{
+        <i *ngIf="task.isGoogleTask" class="pi pi-google flex items-center float-right text-[.7rem] mb-2 mr-2" [ngClass]="task.nameDay"></i>
+        <p class="name-task no-underline hover:underline font-bold cursor-pointer" (click)="openTaskDetail(task)">
+          {{
           task.name.length > 30 ?
           task.name.substring(0, task.name.substring(0, 30).lastIndexOf(' ')) + ' ...' :
           task.name
-        }}</p>
+          }}</p>
       </div>
       <div class="flex">
         <!-- <p class="date flex items-center text-xs text-neutral-400 mr-2">{{task.dueDate | date:'short'}}</p>
@@ -22,9 +23,9 @@
     <div class="des-task mb-2">
       <p class="float-left text-xs w-9/12">
         {{
-          task.description.length > 100 ?
-          task.description.substring(0, task.description.substring(0, 100).lastIndexOf(' ')) + ' ...' :
-          task.description
+        task.description.length > 100 ?
+        task.description.substring(0, task.description.substring(0, 100).lastIndexOf(' ')) + ' ...' :
+        task.description
         }}
       </p>
       <i class="pi pi-check  float-right text-xs font-bold text-green-600 cursor-pointer"
@@ -40,7 +41,8 @@
   </ng-template>
 
   <ng-template #todayTags>
-    <p-tag *ngIf="task.nameDay === 'Today'; else dayTags" styleClass="mb-2" value="{{task.dueDate | date:'short'}}"></p-tag>
+    <p-tag *ngIf="task.nameDay === 'Today'; else dayTags" styleClass="mb-2" value="{{task.dueDate | date:'short'}}">
+    </p-tag>
   </ng-template>
 
   <ng-template #dayTags>

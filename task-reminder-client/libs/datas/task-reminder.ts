@@ -26,6 +26,7 @@ export interface ITaskReminderDetail {
   dueDate: Date;
   done: boolean;
   deleted: boolean;
+  isGoogleTask: boolean;
   // [key: string]: any;
 }
 
