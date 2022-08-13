@@ -39,3 +39,8 @@ export const getToken = createSelector(
   getUserState,
   (state: State) => state?.token ?? ''
 );
+
+export const checkCallToken = createSelector(
+  getUserState,
+  (state: State) => state?.isCallToken ?? false
+);

@@ -30,3 +30,18 @@ export const loginWithGoogleFailure = createAction(
   '[User/API] Login With Google failure',
   props<{ error: HttpErrorResponse }>()
 );
+
+export const checkCallOAuthGoogle = createAction(
+  '[User/API] Check Call OAuth Google',
+  props<{ email: string }>()
+);
+
+export const checkCallOAuthGoogleSuccess = createAction(
+  '[User/API] Check Call OAuth Google success',
+  props<{ isCallToken: boolean }>()
+);
+
+export const checkCallOAuthGoogleFailure = createAction(
+  '[User/API] Check Call OAuth Google failure',
+  props<{ error: HttpErrorResponse }>()
+);

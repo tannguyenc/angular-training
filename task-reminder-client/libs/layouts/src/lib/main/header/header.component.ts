@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import * as StateSelectors from '@task-reminder-client/states/task';
 import * as StateActions from '@task-reminder-client/states/task';
-import { SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
 
 @Component({
   selector: 'task-reminder-client-header',
@@ -24,7 +23,7 @@ export class HeaderComponent implements OnInit {
 
   avatarUrl = localStorage.getItem("photoUrl");
 
-  constructor(private router: Router, private store: Store, private readonly _authService: SocialAuthService) { }
+  constructor(private router: Router, private store: Store) { }
 
   ngOnInit(): void { }
 
@@ -32,11 +31,6 @@ export class HeaderComponent implements OnInit {
     localStorage.removeItem('token');
     localStorage.setItem('userId', '0');
     localStorage.setItem('photoUrl', '');
-    this._authService.authState.subscribe((user: SocialUser) => {
-      if (user) {
-        this._authService.signOut();
-      }
-    });
     this.router.navigate(['/login']);
   }
 }

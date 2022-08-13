@@ -12,6 +12,8 @@ namespace TaskReminderAPI.Models
         public DateTime Created { get; set; }
         public bool Deleted { get; set; }
         public string PhotoUrl { get; set; }
-        public string AccessToken { get; set; }
+        public string AccessTokenGoogle { get; set; }
+        public string RefreshTokenGoogle { get; set; }
+        public DateTime ExpiresInGoogle { get; set; }
     }
 }

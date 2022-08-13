@@ -49,6 +49,19 @@ export class UserEffects {
     )
   );
 
+  checkCallOAuthGoogle$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UserActions.checkCallOAuthGoogle),
+      exhaustMap(({ email }) => this.userService.checkCallOAuthGoogle(email).pipe(
+        map(resp => UserActions.checkCallOAuthGoogleSuccess({ isCallToken: resp })),
+        catchError((error: HttpErrorResponse) => {
+          this.messageService.add({ severity: 'error', summary: 'Login failed', detail: error.error });
+          return of(UserActions.checkCallOAuthGoogleFailure({ error }))
+        })
+      ))
+    )
+  );
+
   constructor(private readonly actions$: Actions,
     private userService: UserService,
     private router: Router,
