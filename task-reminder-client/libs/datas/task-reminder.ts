@@ -18,7 +18,7 @@ export interface ITaskResponse {
 }
 
 export interface ITaskReminderDetail {
-  id: number;
+  id: string;
   name: string;
   nameDay: string;
   description: string;
@@ -27,6 +27,7 @@ export interface ITaskReminderDetail {
   done: boolean;
   deleted: boolean;
   isGoogleTask: boolean;
+  googleTaskListId: string;
   // [key: string]: any;
 }
 
@@ -35,10 +36,18 @@ export interface IUpdateDone {
   isDone: boolean;
 }
 
+export interface IGoogleCalendarTaskListItem {
+  id: string;
+  title: string;
+}
+
 export interface IAddTaskReminder {
-  id: number;
+  id: string;
   name: string;
   description: string;
   dueDate: Date;
   userId: number;
+  googleTaskListId: string;
+  isGoogleTask: boolean;
+  isDone: boolean;
 }

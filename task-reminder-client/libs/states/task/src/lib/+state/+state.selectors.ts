@@ -59,3 +59,8 @@ export const getSelected = createSelector(
   getSelectedId,
   (entities, selectedId) => (selectedId ? entities[selectedId] : undefined)
 );
+
+export const getGoogleTaskList = createSelector(
+  getStateState,
+  (state: State) => state.googleTaskLists
+);

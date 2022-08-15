@@ -22,17 +22,20 @@ export class AddOrUpdateTaskComponent implements OnInit {
     private store: Store
   ) {
     this.taskForm = this.formBuilder.group({
-      id: [0, Validators.required],
+      id: ['0', Validators.required],
       name: ['', Validators.required],
       description: [''],
       dueDate: ['', Validators.required],
-      dueTime: [new Date(), Validators.required]
+      dueTime: [new Date(), Validators.required],
+      isDone: [false],
+      isGoogleTask: [false],
+      googleTaskListId: [''],
     });
   }
 
   ngOnInit() {
     const currentTask = this.config.data as IAddTaskReminder;
-    if (currentTask?.id > 0) {
+    if (currentTask?.id !== '0') {
       this.taskForm.patchValue(currentTask);
       this.isAdd = false;
     }
@@ -65,10 +68,10 @@ export class AddOrUpdateTaskComponent implements OnInit {
       userId: this.getCurrentUserId()
     };
 
-    if (this.taskForm.value?.id > 0) {
-      this.store.dispatch(StateActions.UpdateTask({ task: form }));
+    if (this.taskForm.value?.id !== '0') {
+      this.store.dispatch(StateActions.updateTask({ task: form }));
     } else {
-      this.store.dispatch(StateActions.AddTask({ task: form }));
+      this.store.dispatch(StateActions.addTask({ task: form }));
     }
     this.ref.close();
   }

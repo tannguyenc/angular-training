@@ -1,4 +1,4 @@
-import { IAddTaskReminder, ITaskReminderDetail } from './../../../../datas/task-reminder';
+import { IAddTaskReminder, IGoogleCalendarTaskListItem, ITaskReminderDetail } from './../../../../datas/task-reminder';
 import { TaskReminderStatus } from './../../../../datas/task-reminder';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
@@ -28,9 +28,13 @@ export class TaskService {
     return this.http.get<ITaskReminderDetail[]>(url, httpOptions);
   }
 
-  updateDoneTask(id: number, isDone: boolean): Observable<ITaskReminderDetail> {
-    const url = `${this.baseUrl}api/TaskReminder/${id}/done?isDone=${isDone}`;
-    return this.http.put<ITaskReminderDetail>(url, httpOptions);
+  updateDoneTask(task: IAddTaskReminder): Observable<ITaskReminderDetail> {
+    task = {
+      ...task,
+      userId: this.getCurrentUserId()
+    };
+    const url = `${this.baseUrl}api/TaskReminder/${task.id}/done`;
+    return this.http.put<ITaskReminderDetail>(url, task, httpOptions);
   }
 
   addTask(task: IAddTaskReminder): Observable<ITaskReminderDetail> {
@@ -50,5 +54,12 @@ export class TaskService {
       return +userIdLocal;
     }
     return userId;
+  }
+
+  getGoogleTaskList(): Observable<IGoogleCalendarTaskListItem[]> {
+
+    const userId = this.getCurrentUserId();
+    const url = `${this.baseUrl}api/TaskReminder/googleTaskList?UserId=${userId}`;
+    return this.http.get<IGoogleCalendarTaskListItem[]>(url, httpOptions);
   }
 }

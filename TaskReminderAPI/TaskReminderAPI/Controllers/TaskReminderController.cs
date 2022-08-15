@@ -26,7 +26,7 @@ namespace TaskReminderAPI.Controllers
             var resp = await _context.TaskReminders.Where(x => !x.Deleted && x.DueDate.HasValue && request.UserId == x.CreatedUserId).ToListAsync();
             var datas = resp.Select(x => new TaskReminderResponse
             {
-                Id = x.Id,
+                Id = x.Id.ToString(),
                 DueDate = x.DueDate,
                 Created = x.Created,
                 CreatedUserId = x.CreatedUserId,
@@ -34,11 +34,12 @@ namespace TaskReminderAPI.Controllers
                 Description = x.Description,
                 Done = x.Done,
                 IsGoogleTask = false,
-                Name = x.Name
+                Name = x.Name,
+                GoogleTaskListId = ""
             }).ToList();
 
             //var events = await GetEventGoogleCalendarAsync(user, datas.Count + 1);
-            var tasks = await GetGoogleCalendarTasksAsync(user, datas.Count);
+            var tasks = await GetGoogleCalendarTasksAsync(user);
             datas.AddRange(tasks);
             if (datas.Any())
             {
@@ -64,15 +65,16 @@ namespace TaskReminderAPI.Controllers
 
                 results = datas.OrderBy(x => x.DueDate).Select(x => new TaskReminderDetailModel
                 {
+                    GoogleTaskListId = x.GoogleTaskListId,
                     IsGoogleTask = x.IsGoogleTask,
                     Created = x.Created,
                     Deleted = x.Deleted,
                     Description = x.Description,
                     Done = x.Done,
                     DueDate = x.DueDate.Value,
-                    Id = x.Id,
+                    Id = x.Id.ToString(),
                     Name = x.Name,
-                    NameDay = x.Done ? TaskReminderStatus.Completed.ToString() : x.DueDate.Value.Date < timeNow ? 
+                    NameDay = x.Done ? TaskReminderStatus.Completed.ToString() : x.DueDate.Value.Date < timeNow ?
                     TaskReminderStatus.Overdue.ToString() : x.DueDate.Value.Date == timeNow ?
                     TaskReminderStatus.Today.ToString() : TaskReminderStatus.Upcoming.ToString(),
                 }).ToList();
@@ -84,10 +86,38 @@ namespace TaskReminderAPI.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(TaskReminder), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(string id, [FromQuery] GetTaskReminderDetailRequest request)
         {
-            var taskReminder = await _context.TaskReminders.FirstOrDefaultAsync(x => x.Id == id && !x.Deleted);
-            return taskReminder == null ? NotFound() : Ok(taskReminder);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId);
+            if (user == null)
+                return NotFound();
+
+            if (request.IsGoogleTask)
+            {
+                return Ok(await GetGoogleTaskDetail(user, id, request.GoogleTaskListId));
+            }
+            else
+            {
+                int idTask = 0;
+                int.TryParse(id, out idTask);
+                var timeNow = DateTime.Now.Date;
+                var taskReminder = await _context.TaskReminders.FirstOrDefaultAsync(x => x.Id == idTask && !x.Deleted);
+                return taskReminder == null ? NotFound() : Ok(new TaskReminderDetailModel
+                {
+                    GoogleTaskListId = "",
+                    IsGoogleTask = false,
+                    Created = taskReminder.Created,
+                    Deleted = taskReminder.Deleted,
+                    Description = taskReminder.Description,
+                    Done = taskReminder.Done,
+                    DueDate = taskReminder.DueDate.Value,
+                    Id = taskReminder.Id.ToString(),
+                    Name = taskReminder.Name,
+                    NameDay = taskReminder.Done ? TaskReminderStatus.Completed.ToString() : taskReminder.DueDate.Value.Date < timeNow ?
+                        TaskReminderStatus.Overdue.ToString() : taskReminder.DueDate.Value.Date == timeNow ?
+                        TaskReminderStatus.Today.ToString() : TaskReminderStatus.Upcoming.ToString(),
+                });
+            }
         }
 
         [HttpGet("search/{name}")]
@@ -101,12 +131,17 @@ namespace TaskReminderAPI.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> Create(AddTaskReminderRequest task)
+        public async Task<IActionResult> Create([FromBody] AddOrUpdateTaskReminderRequest task)
         {
-            if(task.IsGoogleTask)
-            {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == task.UserId);
+            if (user == null)
+                return NotFound();
 
-            }else
+            if (task.IsGoogleTask)
+            {
+                return Ok(await CreateGoogleTask(user, task));
+            }
+            else
             {
                 var taskReminder = new TaskReminder
                 {
@@ -125,94 +160,154 @@ namespace TaskReminderAPI.Controllers
 
                 return Ok(new TaskReminderDetailModel
                 {
+                    IsGoogleTask = false,
+                    GoogleTaskListId = "",
                     Created = taskReminder.Created,
                     Deleted = taskReminder.Deleted,
                     Description = taskReminder.Description,
                     Done = taskReminder.Done,
                     DueDate = taskReminder.DueDate.Value,
-                    Id = taskReminder.Id,
+                    Id = taskReminder.Id.ToString(),
                     Name = taskReminder.Name,
                     NameDay = taskReminder.Done ? TaskReminderStatus.Completed.ToString() : taskReminder.DueDate.Value.Date < timeNow ?
                         TaskReminderStatus.Overdue.ToString() : taskReminder.DueDate.Value.Date == timeNow ?
                         TaskReminderStatus.Today.ToString() : TaskReminderStatus.Upcoming.ToString()
                 });
             }
-
-            //return CreatedAtAction(nameof(GetById), new { id = taskReminder.Id }, taskReminder);
         }
 
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update(int id, UpdateTaskReminderRequest task)
+        public async Task<IActionResult> Update(string id, [FromBody] AddOrUpdateTaskReminderRequest task)
         {
             if (id != task.Id) return BadRequest();
 
-            var taskReminder = await _context.TaskReminders.FindAsync(id);
-            if (taskReminder == null) return NotFound();
-            taskReminder.Name = task.Name;
-            taskReminder.Description = task.Description;
-            taskReminder.DueDate = task.DueDate.ToLocalTime();
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == task.UserId);
+            if (user == null)
+                return NotFound();
 
-            _context.TaskReminders.Update(taskReminder);
-            await _context.SaveChangesAsync();
-            var timeNow = DateTime.Now.Date;
-
-            return Ok(new TaskReminderDetailModel
+            if (task.IsGoogleTask)
             {
-                Created = taskReminder.Created,
-                Deleted = taskReminder.Deleted,
-                Description = taskReminder.Description,
-                Done = taskReminder.Done,
-                DueDate = taskReminder.DueDate.Value,
-                Id = taskReminder.Id,
-                Name = taskReminder.Name,
-                NameDay = taskReminder.Done ? TaskReminderStatus.Completed.ToString() : taskReminder.DueDate.Value.Date < timeNow ?
-                    TaskReminderStatus.Overdue.ToString() : taskReminder.DueDate.Value.Date == timeNow ?
-                    TaskReminderStatus.Today.ToString() : TaskReminderStatus.Upcoming.ToString()
-            });
-            //return Ok(taskReminder);
+                return Ok(await UpdateGoogleTask(user, task));
+            }
+            else
+            {
+                int idTask = 0;
+                int.TryParse(id, out idTask);
+
+                var taskReminder = await _context.TaskReminders.FindAsync(idTask);
+                if (taskReminder == null) return NotFound();
+                taskReminder.Name = task.Name;
+                taskReminder.Description = task.Description;
+                taskReminder.DueDate = task.DueDate.ToLocalTime();
+
+                _context.TaskReminders.Update(taskReminder);
+                await _context.SaveChangesAsync();
+                var timeNow = DateTime.Now.Date;
+
+                return Ok(new TaskReminderDetailModel
+                {
+                    GoogleTaskListId = "",
+                    IsGoogleTask = false,
+                    Created = taskReminder.Created,
+                    Deleted = taskReminder.Deleted,
+                    Description = taskReminder.Description,
+                    Done = taskReminder.Done,
+                    DueDate = taskReminder.DueDate.Value,
+                    Id = id,
+                    Name = taskReminder.Name,
+                    NameDay = taskReminder.Done ? TaskReminderStatus.Completed.ToString() : taskReminder.DueDate.Value.Date < timeNow ?
+                        TaskReminderStatus.Overdue.ToString() : taskReminder.DueDate.Value.Date == timeNow ?
+                        TaskReminderStatus.Today.ToString() : TaskReminderStatus.Upcoming.ToString()
+                });
+            }
         }
 
         [HttpPut("{id}/done")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateDoneStatus(int id, [FromQuery] bool isDone)
+        public async Task<IActionResult> UpdateDoneStatus(string id, [FromBody] AddOrUpdateTaskReminderRequest task)
         {
-            var taskReminder = await _context.TaskReminders.FirstOrDefaultAsync(x => x.Id == id && !x.Deleted);
-            if (taskReminder == null) return NotFound();
+            if (id != task.Id) return BadRequest();
 
-            taskReminder.Done = isDone;
-            _context.TaskReminders.Update(taskReminder);
-            await _context.SaveChangesAsync();
-            var timeNow = DateTime.Now.Date;
-            return Ok(new TaskReminderDetailModel
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == task.UserId);
+            if (user == null)
+                return NotFound();
+
+            if (task.IsGoogleTask)
             {
-                Created = taskReminder.Created,
-                Deleted = taskReminder.Deleted,
-                Description = taskReminder.Description,
-                Done = taskReminder.Done,
-                DueDate = taskReminder.DueDate.Value,
-                Id = taskReminder.Id,
-                Name = taskReminder.Name,
-                NameDay = taskReminder.Done ? TaskReminderStatus.Completed.ToString() : taskReminder.DueDate.Value.Date < timeNow ?
-                    TaskReminderStatus.Overdue.ToString() : taskReminder.DueDate.Value.Date == timeNow ?
-                    TaskReminderStatus.Today.ToString() : TaskReminderStatus.Upcoming.ToString()
-            });
+                return Ok(await UpdateGoogleTask(user, task));
+            }
+            else
+            {
+                int idTask = 0;
+                int.TryParse(id, out idTask);
+
+                var taskReminder = await _context.TaskReminders.FirstOrDefaultAsync(x => x.Id == idTask && !x.Deleted);
+                if (taskReminder == null) return NotFound();
+
+                taskReminder.Done = task.IsDone;
+                _context.TaskReminders.Update(taskReminder);
+                await _context.SaveChangesAsync();
+                var timeNow = DateTime.Now.Date;
+                return Ok(new TaskReminderDetailModel
+                {
+                    GoogleTaskListId = "",
+                    IsGoogleTask = false,
+                    Created = taskReminder.Created,
+                    Deleted = taskReminder.Deleted,
+                    Description = taskReminder.Description,
+                    Done = taskReminder.Done,
+                    DueDate = taskReminder.DueDate.Value,
+                    Id = taskReminder.Id.ToString(),
+                    Name = taskReminder.Name,
+                    NameDay = taskReminder.Done ? TaskReminderStatus.Completed.ToString() : taskReminder.DueDate.Value.Date < timeNow ?
+                        TaskReminderStatus.Overdue.ToString() : taskReminder.DueDate.Value.Date == timeNow ?
+                        TaskReminderStatus.Today.ToString() : TaskReminderStatus.Upcoming.ToString()
+                });
+            }
         }
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string id, [FromBody] AddOrUpdateTaskReminderRequest task)
         {
-            var taskReminderToDelete = await _context.TaskReminders.FindAsync(id);
-            if (taskReminderToDelete == null) return NotFound();
-            taskReminderToDelete.Deleted = true;
-            _context.TaskReminders.Update(taskReminderToDelete);
-            await _context.SaveChangesAsync();
+            if (id != task.Id) return BadRequest();
 
-            return NoContent();
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == task.UserId);
+            if (user == null)
+                return NotFound();
+
+            if (task.IsGoogleTask)
+            {
+                var result = await DeleteGoogleTask(user, id, task.GoogleTaskListId);
+                if (result)
+                    return NoContent();
+                return BadRequest();
+            }
+            else
+            {
+                int idTask = 0;
+                int.TryParse(id, out idTask); var taskReminderToDelete = await _context.TaskReminders.FindAsync(id);
+                if (taskReminderToDelete == null) return NotFound();
+                taskReminderToDelete.Deleted = true;
+                _context.TaskReminders.Update(taskReminderToDelete);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+        }
+
+        [HttpGet("googleTaskList")]
+        public async Task<List<GoogleCalendarTaskListItem>> GetGoogleCalendarTaskList([FromQuery] int userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            if (user == null)
+                return new List<GoogleCalendarTaskListItem>();
+
+            return await GetGoogleCalendarTaskListAsync(user);
         }
 
         private async Task<List<TaskReminder>> GetEventGoogleCalendarAsync(User user, int totalTask)
@@ -234,16 +329,16 @@ namespace TaskReminderAPI.Controllers
                 response.EnsureSuccessStatusCode();
 
                 var responseStream = await response.Content.ReadAsStringAsync();
-                if(!string.IsNullOrEmpty( responseStream))
+                if (!string.IsNullOrEmpty(responseStream))
                 {
                     events = JsonConvert.DeserializeObject<GoogleCalendarEvents>(responseStream);
                 }
-                
-                if(events!= null && events.items.Any())
+
+                if (events != null && events.items.Any())
                 {
                     Random rnd = new Random();
 
-                    for(var i = 0; i < events.items.Count; i++)
+                    for (var i = 0; i < events.items.Count; i++)
                     {
                         var x = events.items[i];
 
@@ -257,7 +352,7 @@ namespace TaskReminderAPI.Controllers
                             Name = x.summary,
                             CreatedUserId = user.Id,
                             Id = i + totalTask
-                        }) ;
+                        });
                     }
 
                     //results = events.items.Select(x=> new TaskReminder
@@ -277,24 +372,10 @@ namespace TaskReminderAPI.Controllers
             return results;
         }
 
-        private async Task<List<TaskReminderResponse>> GetGoogleCalendarTasksAsync(User user, int totalTask)
+        private async Task<List<TaskReminderResponse>> GetGoogleCalendarTasksAsync(User user)
         {
             var results = new List<TaskReminderResponse>();
-            var idTask = totalTask++;
-            var accessTokenGoogle = user.AccessTokenGoogle;
-
-            if (!string.IsNullOrEmpty(user.RefreshTokenGoogle) && user.ExpiresInGoogle <= DateTime.Now)
-            {
-                var newToken = await GoogleAccessTokenFromRefreshToken(user.RefreshTokenGoogle);
-                if (newToken != null && !string.IsNullOrEmpty(newToken.access_token) && newToken.expires_in > 0)
-                {
-                    user.ExpiresInGoogle = DateTime.Now.AddSeconds(newToken.expires_in);
-                    user.AccessTokenGoogle = newToken.access_token;
-                    accessTokenGoogle = newToken.access_token;
-                    _context.Users.Update(user);
-                    await _context.SaveChangesAsync();
-                }
-            }
+            var accessTokenGoogle = await GetGoogleAccessToken(user);
 
             try
             {
@@ -326,41 +407,25 @@ namespace TaskReminderAPI.Controllers
 
                             if (tasks != null && tasks.items.Any())
                             {
-                                for (var i = 0; i < tasks.items.Count; i++)
+                                results = tasks.items.Select(x => new TaskReminderResponse
                                 {
-                                    var x = tasks.items[i];
-
-                                    results.Add(new TaskReminderResponse
-                                    {
-                                        Created = x.updated,
-                                        Deleted = false,
-                                        Description = x.notes,
-                                        Done = x.status == "completed",
-                                        DueDate = x.due,
-                                        Name = x.title,
-                                        CreatedUserId = user.Id,
-                                        Id = idTask++,
-                                        IsGoogleTask = true
-                                    });
-                                }
-
-                                //results = events.items.Select(x=> new TaskReminder
-                                //{
-                                //    Created = x.created,
-                                //    Deleted = false,
-                                //    Description = x.description,
-                                //    Done = false,
-                                //    DueDate = x.start.dateTime,
-                                //    Name = x.summary,
-                                //    CreatedUserId = user.Id,
-                                //    Id = rnd
-                                //}).ToList();
+                                    Created = x.updated,
+                                    Deleted = false,
+                                    Description = x.notes,
+                                    Done = x.status == "completed",
+                                    DueDate = x.due,
+                                    Name = x.title,
+                                    CreatedUserId = user.Id,
+                                    Id = x.id,
+                                    IsGoogleTask = true,
+                                    GoogleTaskListId = taskList.id,
+                                }).ToList();
                             }
                         }
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 results = new List<TaskReminderResponse>();
             }
@@ -372,20 +437,7 @@ namespace TaskReminderAPI.Controllers
         {
             var result = new List<GoogleCalendarTaskListItem>();
 
-            var accessTokenGoogle = user.AccessTokenGoogle;
-
-            if (!string.IsNullOrEmpty(user.RefreshTokenGoogle) && user.ExpiresInGoogle <= DateTime.Now)
-            {
-                var newToken = await GoogleAccessTokenFromRefreshToken(user.RefreshTokenGoogle);
-                if (newToken != null && !string.IsNullOrEmpty(newToken.access_token) && newToken.expires_in > 0)
-                {
-                    user.ExpiresInGoogle = DateTime.Now.AddSeconds(newToken.expires_in);
-                    user.AccessTokenGoogle = newToken.access_token;
-                    accessTokenGoogle = newToken.access_token;
-                    _context.Users.Update(user);
-                    await _context.SaveChangesAsync();
-                }
-            }
+            var accessTokenGoogle = await GetGoogleAccessToken(user);
 
             try
             {
@@ -418,11 +470,11 @@ namespace TaskReminderAPI.Controllers
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 result = new List<GoogleCalendarTaskListItem>();
             }
-            
+
 
             return result;
         }
@@ -475,6 +527,263 @@ namespace TaskReminderAPI.Controllers
             }
 
             return result;
+        }
+
+        private async Task<TaskReminderDetailModel> CreateGoogleTask(User user, AddOrUpdateTaskReminderRequest task)
+        {
+            var result = new TaskReminderDetailModel();
+
+            var accessTokenGoogle = await GetGoogleAccessToken(user);
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    //set request
+                    var request = new HttpRequestMessage(HttpMethod.Post, $"https://tasks.googleapis.com/tasks/v1/lists/" +
+                        $"{task.GoogleTaskListId}/tasks?key=AIzaSyCNGPlz9EvS0yU2BdT_3pLpTm58zDc0Vec");
+                    //set Header
+                    request.Headers.Authorization = new AuthenticationHeaderValue(
+                        "Bearer", accessTokenGoogle);
+
+                    //content
+                    var json = JsonConvert.SerializeObject(new
+                    {
+                        kind = "tasks#tasks",
+                        title = task.Name,
+                        notes = task.Description,
+                        status = "needsAction",
+                        due = task.DueDate,
+                        deleted = false
+                    });
+                    request.Content = new StringContent(json);
+
+                    //get response
+                    var response = await client.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Get the response
+                        var customerJsonString = await response.Content.ReadAsStringAsync();
+
+                        // Deserialise the data (include the Newtonsoft JSON Nuget package if you don't already have it)
+                        var deserialized = JsonConvert.DeserializeObject<GoogleCalendarTaskItem>(custome‌​rJsonString);
+                        if (deserialized != null && !string.IsNullOrEmpty(deserialized.id))
+                        {
+                            var timeNow = DateTime.Now;
+                            result = new TaskReminderDetailModel
+                            {
+                                GoogleTaskListId = task.GoogleTaskListId,
+                                Id = deserialized.id,
+                                Created = deserialized.updated,
+                                Deleted = false,
+                                Description = deserialized.notes,
+                                Done = deserialized.status == "completed",
+                                DueDate = deserialized.due,
+                                IsGoogleTask = true,
+                                Name = deserialized.title,
+                                NameDay = deserialized.status == "completed" ? TaskReminderStatus.Completed.ToString() :
+                                deserialized.due.Date < timeNow ?
+                                TaskReminderStatus.Overdue.ToString() :
+                                    deserialized.due.Date == timeNow ?
+                                    TaskReminderStatus.Today.ToString() :
+                                    TaskReminderStatus.Upcoming.ToString()
+                            };
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result = new TaskReminderDetailModel();
+            }
+
+            return result;
+        }
+
+        private async Task<TaskReminderDetailModel> UpdateGoogleTask(User user, AddOrUpdateTaskReminderRequest task)
+        {
+            var result = new TaskReminderDetailModel();
+
+            var accessTokenGoogle = await GetGoogleAccessToken(user);
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    //set request
+                    var request = new HttpRequestMessage(HttpMethod.Put, $"https://tasks.googleapis.com/tasks/v1/lists/" +
+                        $"{task.GoogleTaskListId}/tasks/{task.Id}?key=AIzaSyCNGPlz9EvS0yU2BdT_3pLpTm58zDc0Vec");
+                    //set Header
+                    request.Headers.Authorization = new AuthenticationHeaderValue(
+                        "Bearer", accessTokenGoogle);
+
+                    //content
+
+                    var json = JsonConvert.SerializeObject(new
+                    {
+                        id = task.Id,
+                        title = task.Name,
+                        notes = task.Description,
+                        due = task.DueDate,
+                        status = task.IsDone ? "completed" : "needsAction",
+                    });
+                    request.Content = new StringContent(json);
+
+
+                    //get response
+                    var response = await client.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Get the response
+                        var customerJsonString = await response.Content.ReadAsStringAsync();
+
+                        // Deserialise the data (include the Newtonsoft JSON Nuget package if you don't already have it)
+                        var deserialized = JsonConvert.DeserializeObject<GoogleCalendarTaskItem>(custome‌​rJsonString);
+                        if (deserialized != null && !string.IsNullOrEmpty(deserialized.id))
+                        {
+                            var timeNow = DateTime.Now;
+                            result = new TaskReminderDetailModel
+                            {
+                                GoogleTaskListId = task.GoogleTaskListId,
+                                Id = deserialized.id,
+                                Created = deserialized.updated,
+                                Deleted = false,
+                                Description = deserialized.notes,
+                                Done = deserialized.status == "completed",
+                                DueDate = deserialized.due,
+                                IsGoogleTask = true,
+                                Name = deserialized.title,
+                                NameDay = deserialized.status == "completed" ? TaskReminderStatus.Completed.ToString() :
+                                deserialized.due.Date < timeNow ?
+                                TaskReminderStatus.Overdue.ToString() :
+                                    deserialized.due.Date == timeNow ?
+                                    TaskReminderStatus.Today.ToString() :
+                                    TaskReminderStatus.Upcoming.ToString()
+                            };
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result = new TaskReminderDetailModel();
+            }
+
+            return result;
+        }
+
+        private async Task<TaskReminderDetailModel> GetGoogleTaskDetail(User user, string id, string taskList)
+        {
+            var result = new TaskReminderDetailModel();
+
+            var accessTokenGoogle = await GetGoogleAccessToken(user);
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    //set request
+                    var request = new HttpRequestMessage(HttpMethod.Get, $"https://tasks.googleapis.com/tasks/v1/lists/" +
+                        $"{taskList}/tasks/{id}?key=AIzaSyCNGPlz9EvS0yU2BdT_3pLpTm58zDc0Vec");
+                    //set Header
+                    request.Headers.Authorization = new AuthenticationHeaderValue(
+                        "Bearer", accessTokenGoogle);
+                    //get response
+                    var response = await client.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Get the response
+                        var customerJsonString = await response.Content.ReadAsStringAsync();
+
+                        // Deserialise the data (include the Newtonsoft JSON Nuget package if you don't already have it)
+                        var deserialized = JsonConvert.DeserializeObject<GoogleCalendarTaskItem>(custome‌​rJsonString);
+                        if (deserialized != null && !string.IsNullOrEmpty(deserialized.id))
+                        {
+                            var timeNow = DateTime.Now;
+                            result = new TaskReminderDetailModel
+                            {
+                                GoogleTaskListId = taskList,
+                                Id = deserialized.id,
+                                Created = deserialized.updated,
+                                Deleted = false,
+                                Description = deserialized.notes,
+                                Done = deserialized.status == "completed",
+                                DueDate = deserialized.due,
+                                IsGoogleTask = true,
+                                Name = deserialized.title,
+                                NameDay = deserialized.status == "completed" ? TaskReminderStatus.Completed.ToString() :
+                                deserialized.due.Date < timeNow ?
+                                TaskReminderStatus.Overdue.ToString() :
+                                    deserialized.due.Date == timeNow ?
+                                    TaskReminderStatus.Today.ToString() :
+                                    TaskReminderStatus.Upcoming.ToString()
+                            };
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result = new TaskReminderDetailModel();
+            }
+
+            return result;
+        }
+
+        private async Task<bool> DeleteGoogleTask(User user, string id, string taskList)
+        {
+            var result = false;
+
+            var accessTokenGoogle = await GetGoogleAccessToken(user);
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    //set request
+                    var request = new HttpRequestMessage(HttpMethod.Delete, $"https://tasks.googleapis.com/tasks/v1/lists/" +
+                        $"{taskList}/tasks/{id}?key=AIzaSyCNGPlz9EvS0yU2BdT_3pLpTm58zDc0Vec");
+                    //set Header
+                    request.Headers.Authorization = new AuthenticationHeaderValue(
+                        "Bearer", accessTokenGoogle);
+                    //get response
+                    var response = await client.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        result = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result = false;
+            }
+
+            return result;
+        }
+
+        private async Task<string> GetGoogleAccessToken(User user)
+        {
+            var accessTokenGoogle = user.AccessTokenGoogle;
+
+            if (!string.IsNullOrEmpty(user.RefreshTokenGoogle) && user.ExpiresInGoogle <= DateTime.Now)
+            {
+                var newToken = await GoogleAccessTokenFromRefreshToken(user.RefreshTokenGoogle);
+                if (newToken != null && !string.IsNullOrEmpty(newToken.access_token) && newToken.expires_in > 0)
+                {
+                    user.ExpiresInGoogle = DateTime.Now.AddSeconds(newToken.expires_in);
+                    user.AccessTokenGoogle = newToken.access_token;
+                    accessTokenGoogle = newToken.access_token;
+                    _context.Users.Update(user);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            return accessTokenGoogle;
         }
     }
 }
