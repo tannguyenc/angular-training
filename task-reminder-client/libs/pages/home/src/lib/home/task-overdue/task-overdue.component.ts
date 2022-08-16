@@ -1,4 +1,4 @@
-import { IAddTaskReminder, IUpdateDone, TaskReminderStatus } from './../../../../../../datas/task-reminder';
+import { IAddTaskReminder, ITaskReminderDetailRequest, IUpdateDone, TaskReminderStatus } from './../../../../../../datas/task-reminder';
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as StateSelectors from '@task-reminder-client/states/task';
@@ -44,5 +44,10 @@ export class TaskOverdueComponent implements OnInit {
 
   onUpdateDone(task: IAddTaskReminder) {
     this.store.dispatch(StateActions.updateDoneTask({ task }));
+  }
+
+  onDeleteTask(task: ITaskReminderDetailRequest) {
+    console.log(task);
+    this.store.dispatch(StateActions.deleteTask({ task }));
   }
 }

@@ -51,3 +51,13 @@ export interface IAddTaskReminder {
   isGoogleTask: boolean;
   isDone: boolean;
 }
+
+export interface ITaskReminderDetailRequest {
+  id: string;
+  googleTaskListId: string;
+  isGoogleTask: boolean;
+}
+
+export interface ITaskReminderDetailResponse {
+  id: string;
+}

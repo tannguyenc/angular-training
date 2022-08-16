@@ -51,6 +51,9 @@ export class AddOrUpdateTaskComponent implements OnInit {
   ngOnInit() {
     const currentTask = this.config.data as IAddTaskReminder;
     if (currentTask !== undefined && currentTask.id !== '0') {
+      // this.store.select(StateSelectors.getSelected).subscribe(task => {
+      //   console.log(task);
+      // });
       this.taskForm.controls['isGoogleTask'].disable();
       this.taskForm.controls['googleTaskListId'].disable();
       this.taskForm.patchValue(currentTask);

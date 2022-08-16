@@ -35,7 +35,7 @@ namespace TaskReminderAPI.Models
     public class GetTaskReminderDetailRequest
     {
         public int UserId { get; set; }
-        public string GoogleTaskListId { get; set; }
+        public string? GoogleTaskListId { get; set; }
         public bool IsGoogleTask { get; set; }
 
     }

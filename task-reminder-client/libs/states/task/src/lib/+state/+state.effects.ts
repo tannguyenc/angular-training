@@ -84,6 +84,38 @@ export class StateEffects {
     )
   );
 
+  taskDetail$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(StateActions.taskDetail),
+      exhaustMap(({ request }) => this.taskService.getTaskDetail(request).pipe(
+        tap(() => {
+          // this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Update task successfully' });
+        }),
+        map(resp => StateActions.taskDetailSuccess({ task: { ...resp, dueDate: new Date(resp.dueDate) } })),
+        catchError((error: HttpErrorResponse) => {
+          this.messageService.add({ severity: 'error', summary: 'Update task failed', detail: error.error });
+          return of(StateActions.taskDetailFailure({ error }))
+        })
+      ))
+    )
+  );
+
+  deleteTask$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(StateActions.deleteTask),
+      exhaustMap(({ task }) => this.taskService.deleteTask(task).pipe(
+        tap(() => {
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Delete task successfully' });
+        }),
+        map(resp => StateActions.deleteTaskSuccess({ task : resp })),
+        catchError((error: HttpErrorResponse) => {
+          this.messageService.add({ severity: 'error', summary: 'Delete task failed', detail: error.error });
+          return of(StateActions.deleteTaskFailure({ error }))
+        })
+      ))
+    )
+  );
+
   constructor(private readonly actions$: Actions,
     private taskService: TaskService,
     private messageService: MessageService) { }

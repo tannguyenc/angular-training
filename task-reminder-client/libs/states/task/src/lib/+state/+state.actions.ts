@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { createAction, props } from '@ngrx/store';
 import { StateEntity } from './+state.models';
-import { IAddTaskReminder, ITaskReminderDetail, TaskReminderStatus, IGoogleCalendarTaskListItem } from './../../../../../datas/task-reminder';
+import { IAddTaskReminder, ITaskReminderDetail, TaskReminderStatus, IGoogleCalendarTaskListItem, ITaskReminderDetailRequest, ITaskReminderDetailResponse } from './../../../../../datas/task-reminder';
 
 export const init = createAction('[State Page] Init');
 
@@ -91,5 +91,35 @@ export const googleTaskListSuccess = createAction(
 
 export const googleTaskListFailure = createAction(
   '[State/API] Get Google TaskList failure',
+  props<{ error: HttpErrorResponse }>()
+);
+
+export const taskDetail = createAction(
+  '[State/API] Task Detail',
+  props<{ request: ITaskReminderDetailRequest }>()
+);
+
+export const taskDetailSuccess = createAction(
+  '[State/API] Task Detail success',
+  props<{ task: ITaskReminderDetail }>()
+);
+
+export const taskDetailFailure = createAction(
+  '[State/API] Task Detail failure',
+  props<{ error: HttpErrorResponse }>()
+);
+
+export const deleteTask = createAction(
+  '[State/API] Delete task',
+  props<{ task: ITaskReminderDetailRequest }>()
+);
+
+export const deleteTaskSuccess = createAction(
+  '[State/API] Delete task success',
+  props<{ task: ITaskReminderDetailResponse }>()
+);
+
+export const deleteTaskFailure = createAction(
+  '[State/API] Delete task failure',
   props<{ error: HttpErrorResponse }>()
 );

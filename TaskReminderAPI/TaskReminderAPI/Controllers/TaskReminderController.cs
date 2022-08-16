@@ -272,31 +272,36 @@ namespace TaskReminderAPI.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(string id, [FromBody] AddOrUpdateTaskReminderRequest task)
+        public async Task<IActionResult> Delete(string id, [FromQuery] GetTaskReminderDetailRequest request)
         {
-            if (id != task.Id) return BadRequest();
-
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == task.UserId);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId);
             if (user == null)
                 return NotFound();
 
-            if (task.IsGoogleTask)
+            if (request.IsGoogleTask)
             {
-                var result = await DeleteGoogleTask(user, id, task.GoogleTaskListId);
-                if (result)
-                    return NoContent();
-                return BadRequest();
+                if (await DeleteGoogleTask(user, id, request.GoogleTaskListId))
+                    return Ok(new
+                    {
+                        id
+                    });
+
+                return NotFound();
             }
             else
             {
                 int idTask = 0;
-                int.TryParse(id, out idTask); var taskReminderToDelete = await _context.TaskReminders.FindAsync(id);
-                if (taskReminderToDelete == null) return NotFound();
-                taskReminderToDelete.Deleted = true;
-                _context.TaskReminders.Update(taskReminderToDelete);
+                int.TryParse(id, out idTask);
+                var timeNow = DateTime.Now.Date;
+                var taskReminder = await _context.TaskReminders.FirstOrDefaultAsync(x => x.Id == idTask && !x.Deleted);
+                if (taskReminder == null) return NotFound();
+                taskReminder.Deleted = true;
+                _context.TaskReminders.Update(taskReminder);
                 await _context.SaveChangesAsync();
-
-                return NoContent();
+                return Ok(new
+                {
+                    id
+                });
             }
         }
 

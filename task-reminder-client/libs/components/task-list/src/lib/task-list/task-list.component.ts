@@ -1,4 +1,4 @@
-import { IUpdateDone, ITaskReminderDetail, IAddTaskReminder } from './../../../../../datas/task-reminder';
+import { ITaskReminderDetail, IAddTaskReminder, ITaskReminderDetailRequest } from './../../../../../datas/task-reminder';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -24,6 +24,7 @@ export class TaskListComponent {
   }
 
   @Output() onUpdateDone: EventEmitter<IAddTaskReminder> = new EventEmitter();
+  @Output() onDeleteTask: EventEmitter<ITaskReminderDetailRequest> = new EventEmitter();
 
   ref: DynamicDialogRef | undefined;
 
@@ -55,6 +56,24 @@ export class TaskListComponent {
         } as IAddTaskReminder;
 
         this.onUpdateDone.emit(doneTask);
+      }
+    });
+  }
+
+  delete(task: ITaskReminderDetail) {
+    console.log('task');
+    console.log(task);
+    this.confirmationService.confirm({
+      message: 'Are you sure that you want to delete task?',
+      header: 'Delete',
+      accept: () => {
+        const deleteTask = {
+          id: task.id,
+          googleTaskListId: task.googleTaskListId,
+          isGoogleTask: task.isGoogleTask,
+        } as ITaskReminderDetailRequest;
+
+        this.onDeleteTask.emit(deleteTask);
       }
     });
   }
