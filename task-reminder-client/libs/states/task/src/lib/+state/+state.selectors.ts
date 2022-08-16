@@ -11,6 +11,11 @@ export const getStateLoaded = createSelector(
   (state: State) => state.loaded
 );
 
+export const getStateLoadedUpdateOrAdd = createSelector(
+  getStateState,
+  (state: State) => state.loadedUpdateOrAdd
+);
+
 export const getStateIsSuccess = createSelector(
   getStateState,
   (state: State) => state.isSuccess

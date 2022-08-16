@@ -12,6 +12,7 @@ export interface State extends EntityState<ITaskReminderDetail> {
   error?: string | null; // last known error (if any)
   isSuccess: boolean;
   googleTaskLists: IGoogleCalendarTaskListItem[];
+  loadedUpdateOrAdd: boolean;
 }
 
 export interface StatePartialState {
@@ -24,6 +25,7 @@ export const stateAdapter: EntityAdapter<ITaskReminderDetail> =
 export const initialState: State = stateAdapter.getInitialState({
   // set initial required properties
   loaded: false,
+  loadedUpdateOrAdd: false,
   isSuccess: false,
   googleTaskLists: []
 });
@@ -35,19 +37,20 @@ const stateReducer = createReducer(
     StateActions.updateDoneTask,
     StateActions.addTask,
     StateActions.updateTask,
-    StateActions.googleTaskList,
      (state) => ({ ...state, loaded: false, isSuccess: false, error: null })),
+     on(StateActions.googleTaskList,
+       (state) => ({ ...state, loadedUpdateOrAdd: false, isSuccess: false, error: null })),
   on(StateActions.loadStateFailure,
     StateActions.allTaskFailure,
     StateActions.updateDoneTaskFailure,
     StateActions.addTaskFailure,
     StateActions.updateTaskFailure,
     StateActions.googleTaskListFailure,
-    (state, { error }) => ({ ...state, error, loaded: true, isSuccess: false })),
+    (state, { error }) => ({ ...state, error, loaded: true, loadedUpdateOrAdd: true, isSuccess: false })),
   on(StateActions.allTaskSuccess,
     (state, { tasks }) => stateAdapter.setAll(tasks, { ...state, loaded: true, isSuccess: false })),
     on(StateActions.googleTaskListSuccess,
-      (state, { googleTaskLists }) => ({ ...state, googleTaskLists , loaded: true, isSuccess: false })),
+      (state, { googleTaskLists }) => ({ ...state, googleTaskLists , loadedUpdateOrAdd: true, isSuccess: false })),
   on(StateActions.updateTaskSuccess,
     (state, { task }) => stateAdapter.updateOne({ id: task.id, changes: task }, { ...state, loaded: true, isSuccess: true })),
   on(StateActions.updateDoneTaskSuccess,
