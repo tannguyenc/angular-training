@@ -2,7 +2,7 @@
   <p-accordion [multiple]="true" (onClose)="onTabClose($event)" (onOpen)="onTabOpen($event)">
     <p-accordionTab *ngFor="let task of (tasks$ | async) || []; let i = index" header="{{task.header}}"
       [selected]="true" class="upcomingTab">
-      <task-reminder-client-task-list (onUpdateDone)="onUpdateDone($event)" [tasks]="task.tasks">
+      <task-reminder-client-task-list (onUpdateDone)="onUpdateDone($event)" (onDeleteTask)="onDeleteTask($event)" [tasks]="task.tasks">
       </task-reminder-client-task-list>
     </p-accordionTab>
   </p-accordion>

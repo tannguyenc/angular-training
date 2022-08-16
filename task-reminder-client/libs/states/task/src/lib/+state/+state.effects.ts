@@ -9,6 +9,17 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable()
 export class StateEffects {
+
+  getGoogleTaskList$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(StateActions.googleTaskList),
+      exhaustMap(() => this.taskService.getGoogleTaskList().pipe(
+        map(resp => StateActions.googleTaskListSuccess({ googleTaskLists: { ...resp } })),
+        catchError((error: HttpErrorResponse) => of(StateActions.googleTaskListFailure({ error })))
+      ))
+    )
+  );
+
   getAllTask$ = createEffect(() =>
     this.actions$.pipe(
       ofType(StateActions.allTask),
@@ -28,9 +39,9 @@ export class StateEffects {
   updateDoneTask$ = createEffect(() =>
     this.actions$.pipe(
       ofType(StateActions.updateDoneTask),
-      exhaustMap(({ id, isDone }) => this.taskService.updateDoneTask(id, isDone).pipe(
+      exhaustMap(({ task }) => this.taskService.updateDoneTask(task).pipe(
         tap(() => {
-          this.messageService.add({severity:'success', summary: 'Success', detail: 'Update task successfully'});
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Update task successfully' });
         }),
         map(resp => StateActions.updateDoneTaskSuccess({ task: { ...resp, dueDate: new Date(resp.dueDate) } })),
         catchError((error: HttpErrorResponse) => {
@@ -43,15 +54,15 @@ export class StateEffects {
 
   addTask$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(StateActions.AddTask),
+      ofType(StateActions.addTask),
       exhaustMap(({ task }) => this.taskService.addTask(task).pipe(
         tap(() => {
-          this.messageService.add({severity:'success', summary: 'Success', detail: 'Add task successfully'});
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Add task successfully' });
         }),
-        map(resp => StateActions.AddTaskSuccess({ task: { ...resp, dueDate: new Date(resp.dueDate) } })),
+        map(resp => StateActions.addTaskSuccess({ task: { ...resp, dueDate: new Date(resp.dueDate) } })),
         catchError((error: HttpErrorResponse) => {
           this.messageService.add({ severity: 'error', summary: 'Add task failed', detail: error.error });
-          return of(StateActions.AddTaskFailure({ error }))
+          return of(StateActions.addTaskFailure({ error }))
         })
       ))
     )
@@ -59,15 +70,47 @@ export class StateEffects {
 
   updateTask$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(StateActions.UpdateTask),
+      ofType(StateActions.updateTask),
       exhaustMap(({ task }) => this.taskService.updateTask(task).pipe(
         tap(() => {
-          this.messageService.add({severity:'success', summary: 'Success', detail: 'Update task successfully'});
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Update task successfully' });
         }),
-        map(resp => StateActions.UpdateTaskSuccess({ task: { ...resp, dueDate: new Date(resp.dueDate) } })),
+        map(resp => StateActions.updateTaskSuccess({ task: { ...resp, dueDate: new Date(resp.dueDate) } })),
         catchError((error: HttpErrorResponse) => {
           this.messageService.add({ severity: 'error', summary: 'Update task failed', detail: error.error });
-          return of(StateActions.UpdateTaskFailure({ error }))
+          return of(StateActions.updateTaskFailure({ error }))
+        })
+      ))
+    )
+  );
+
+  taskDetail$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(StateActions.taskDetail),
+      exhaustMap(({ request }) => this.taskService.getTaskDetail(request).pipe(
+        tap(() => {
+          // this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Update task successfully' });
+        }),
+        map(resp => StateActions.taskDetailSuccess({ task: { ...resp, dueDate: new Date(resp.dueDate) } })),
+        catchError((error: HttpErrorResponse) => {
+          this.messageService.add({ severity: 'error', summary: 'Update task failed', detail: error.error });
+          return of(StateActions.taskDetailFailure({ error }))
+        })
+      ))
+    )
+  );
+
+  deleteTask$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(StateActions.deleteTask),
+      exhaustMap(({ task }) => this.taskService.deleteTask(task).pipe(
+        tap(() => {
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Delete task successfully' });
+        }),
+        map(resp => StateActions.deleteTaskSuccess({ task : resp })),
+        catchError((error: HttpErrorResponse) => {
+          this.messageService.add({ severity: 'error', summary: 'Delete task failed', detail: error.error });
+          return of(StateActions.deleteTaskFailure({ error }))
         })
       ))
     )

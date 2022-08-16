@@ -5,7 +5,7 @@
         (
           task.nameDay === 'Today' ? 'todayTab' : 'upcomingTab'
         )">
-      <task-reminder-client-task-list (onUpdateDone)="onUpdateDone($event)" [tasks]="task.tasks">
+      <task-reminder-client-task-list (onUpdateDone)="onUpdateDone($event)" (onDeleteTask)="onDeleteTask($event)" [tasks]="task.tasks">
       </task-reminder-client-task-list>
     </p-accordionTab>
   </p-accordion>

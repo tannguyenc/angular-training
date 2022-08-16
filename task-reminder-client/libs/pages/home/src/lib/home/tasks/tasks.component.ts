@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { IUpdateDone, TaskReminderStatus } from './../../../../../../datas/task-reminder';
+import { IAddTaskReminder, ITaskReminderDetailRequest, IUpdateDone, TaskReminderStatus } from './../../../../../../datas/task-reminder';
 import * as StateSelectors from '@task-reminder-client/states/task';
 import * as StateActions from '@task-reminder-client/states/task';
 import { map } from 'rxjs';
@@ -46,8 +46,12 @@ export class TasksComponent implements OnInit {
     this.store.dispatch(StateActions.allTask({ request: TaskReminderStatus.All }));
   }
 
-  onUpdateDone(doneTask: IUpdateDone) {
-    this.store.dispatch(StateActions.updateDoneTask({ id: doneTask.id, isDone: doneTask.isDone }));
+  onUpdateDone(task: IAddTaskReminder) {
+    this.store.dispatch(StateActions.updateDoneTask({ task }));
+  }
+
+  onDeleteTask(task: ITaskReminderDetailRequest) {
+    this.store.dispatch(StateActions.deleteTask({ task }));
   }
 
   onTabClose(event: any) {

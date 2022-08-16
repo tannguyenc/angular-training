@@ -16,7 +16,7 @@ namespace TaskReminderAPI.Models
 
     public class TaskReminderDetailModel
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string Name { get; set; }
         public string NameDay { get; set; }
         public string Description { get; set; }
@@ -25,6 +25,7 @@ namespace TaskReminderAPI.Models
         public bool Done { get; set; }
         public bool Deleted { get; set; }
         public bool IsGoogleTask { get; set; }
+        public string GoogleTaskListId { get; set; }
     }
 
     public class GoogleCalendarEvents

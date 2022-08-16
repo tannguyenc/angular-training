@@ -4,6 +4,8 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as StateActions from '@task-reminder-client/states/task';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import * as StateSelectors from '@task-reminder-client/states/task';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'task-reminder-client-add-or-update-task',
@@ -11,9 +13,21 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrls: ['./add-or-update-task.component.scss'],
 })
 export class AddOrUpdateTaskComponent implements OnInit {
+  loading$ = this.store.select(StateSelectors.getStateLoadedUpdateOrAdd);
+
+  googleTaskList$ = this.store.select(StateSelectors.getGoogleTaskList).pipe(
+    map(googleTaskList => {
+      return Object.keys(googleTaskList).map((key: any) => {
+        return {
+          id: googleTaskList[key].id,
+          title: googleTaskList[key].title
+        }
+      });
+    })
+  );
+
   minimumDate = new Date();
   taskForm: FormGroup;
-  isAdd = true;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -22,19 +36,27 @@ export class AddOrUpdateTaskComponent implements OnInit {
     private store: Store
   ) {
     this.taskForm = this.formBuilder.group({
-      id: [0, Validators.required],
+      id: ['0', Validators.required],
       name: ['', Validators.required],
       description: [''],
       dueDate: ['', Validators.required],
-      dueTime: [new Date(), Validators.required]
+      dueTime: [new Date(), Validators.required],
+      isDone: [false],
+      isGoogleTask: [{ value: false, disabled: false }],
+      googleTaskListId: [{ value: '', disabled: false }],
     });
+    this.store.dispatch(StateActions.googleTaskList());
   }
 
   ngOnInit() {
     const currentTask = this.config.data as IAddTaskReminder;
-    if (currentTask?.id > 0) {
+    if (currentTask !== undefined && currentTask.id !== '0') {
+      // this.store.select(StateSelectors.getSelected).subscribe(task => {
+      //   console.log(task);
+      // });
+      this.taskForm.controls['isGoogleTask'].disable();
+      this.taskForm.controls['googleTaskListId'].disable();
       this.taskForm.patchValue(currentTask);
-      this.isAdd = false;
     }
   }
 
@@ -50,6 +72,13 @@ export class AddOrUpdateTaskComponent implements OnInit {
     if (this.taskForm.invalid) {
       return;
     }
+
+    const isGoogleTask = this.taskForm.controls['isGoogleTask'].value;
+    const googleTaskListId = this.taskForm.controls['googleTaskListId'].value;
+    if (isGoogleTask === true && googleTaskListId === '') {
+      return;
+    }
+
     const dueDate = this.taskForm.controls['dueDate'].value;
     const dueTime = this.taskForm.controls['dueTime'].value;
 
@@ -62,13 +91,15 @@ export class AddOrUpdateTaskComponent implements OnInit {
     const form = {
       ...this.taskForm.value,
       dueDate: dueDateValue,
-      userId: this.getCurrentUserId()
+      userId: this.getCurrentUserId(),
+      isGoogleTask: isGoogleTask,
+      googleTaskListId: googleTaskListId
     };
 
-    if (this.taskForm.value?.id > 0) {
-      this.store.dispatch(StateActions.UpdateTask({ task: form }));
+    if (this.taskForm.value?.id !== '0') {
+      this.store.dispatch(StateActions.updateTask({ task: form }));
     } else {
-      this.store.dispatch(StateActions.AddTask({ task: form }));
+      this.store.dispatch(StateActions.addTask({ task: form }));
     }
     this.ref.close();
   }

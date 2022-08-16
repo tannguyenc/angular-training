@@ -25,6 +25,8 @@ import { AccordionModule } from 'primeng/accordion';
 import { CompletedComponent } from './home/completed/completed.component';
 import { UpcomingComponent } from './home/upcoming/upcoming.component';
 import {ProgressSpinnerModule} from 'primeng/progressspinner';
+import {DropdownModule} from 'primeng/dropdown';
+import {CheckboxModule} from 'primeng/checkbox';
 
 @NgModule({
   imports: [
@@ -44,7 +46,8 @@ import {ProgressSpinnerModule} from 'primeng/progressspinner';
     ReactiveFormsModule,
     AccordionModule,
     ProgressSpinnerModule,
-
+    DropdownModule,
+    CheckboxModule
   ],
   declarations: [
     HomeComponent,

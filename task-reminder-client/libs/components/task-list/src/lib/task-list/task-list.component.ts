@@ -1,4 +1,4 @@
-import { IUpdateDone, ITaskReminderDetail } from './../../../../../datas/task-reminder';
+import { ITaskReminderDetail, IAddTaskReminder, ITaskReminderDetailRequest } from './../../../../../datas/task-reminder';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -23,7 +23,8 @@ export class TaskListComponent {
     return this._task;
   }
 
-  @Output() onUpdateDone: EventEmitter<IUpdateDone> = new EventEmitter();
+  @Output() onUpdateDone: EventEmitter<IAddTaskReminder> = new EventEmitter();
+  @Output() onDeleteTask: EventEmitter<ITaskReminderDetailRequest> = new EventEmitter();
 
   ref: DynamicDialogRef | undefined;
 
@@ -32,7 +33,7 @@ export class TaskListComponent {
   // ngOnInit(): void {
   // }
 
-  isDone(id: number, isDone: boolean) {
+  isDone(task: ITaskReminderDetail, isDone: boolean) {
     let message = 'Are you sure that you want mark as undone?';
     let header = 'Mark as undone';
     if (isDone) {
@@ -44,11 +45,35 @@ export class TaskListComponent {
       header: header,
       accept: () => {
         const doneTask = {
-          id: id,
-          isDone: isDone
-        } as IUpdateDone;
+          id: task.id,
+          isDone: isDone,
+          googleTaskListId: task.googleTaskListId,
+          isGoogleTask: task.isGoogleTask,
+          name: task.name,
+          description: task.description,
+          dueDate: task.dueDate,
+          userId: 0
+        } as IAddTaskReminder;
 
         this.onUpdateDone.emit(doneTask);
+      }
+    });
+  }
+
+  delete(task: ITaskReminderDetail) {
+    console.log('task');
+    console.log(task);
+    this.confirmationService.confirm({
+      message: 'Are you sure that you want to delete task?',
+      header: 'Delete',
+      accept: () => {
+        const deleteTask = {
+          id: task.id,
+          googleTaskListId: task.googleTaskListId,
+          isGoogleTask: task.isGoogleTask,
+        } as ITaskReminderDetailRequest;
+
+        this.onDeleteTask.emit(deleteTask);
       }
     });
   }
@@ -56,7 +81,8 @@ export class TaskListComponent {
   openTaskDetail(task: ITaskReminderDetail) {
     const taskDetail = {
       ...task,
-      dueTime: task.dueDate
+      dueTime: task.dueDate,
+      isDone: task.done
     };
     this.ref = this.dialogService.open(AddOrUpdateTaskComponent, {
       data: taskDetail,

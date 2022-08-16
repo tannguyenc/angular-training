@@ -3,10 +3,11 @@
     <div class="mt-4 flex justify-between">
       <div class="nameTask flex">
         <i class="pi pi-circle-fill flex items-center float-right text-[.9rem] mb-2 mr-3" [ngClass]="task.nameDay"></i>
-        <i *ngIf="task.isGoogleTask" class="pi pi-google flex items-center float-right text-[.7rem] mb-2 mr-2" [ngClass]="task.nameDay"></i>
+        <i *ngIf="task.isGoogleTask" class="pi pi-google flex items-center float-right text-[.7rem] mb-2 mr-2"
+          [ngClass]="task.nameDay"></i>
         <p class="name-task no-underline hover:underline font-bold cursor-pointer" (click)="openTaskDetail(task)">
           {{
-          task.name.length > 30 ?
+          task.name && task.name.length > 30 ?
           task.name.substring(0, task.name.substring(0, 30).lastIndexOf(' ')) + ' ...' :
           task.name
           }}</p>
@@ -23,21 +24,24 @@
     <div class="des-task mb-2">
       <p class="float-left text-xs w-9/12">
         {{
-        task.description.length > 100 ?
+        task.description && task.description.length > 100 ?
         task.description.substring(0, task.description.substring(0, 100).lastIndexOf(' ')) + ' ...' :
         task.description
         }}
       </p>
-      <i class="pi pi-check  float-right text-xs font-bold text-green-600 cursor-pointer"
-        *ngIf="task.done; else doneTask" (click)="isDone(task.id, false)" pTooltip="Mark as undone"></i>
-
+      <div class="flex  justify-end items-center">
+        <i class="pi pi-check  float-right text-xs font-bold text-green-600 cursor-pointer"
+          *ngIf="task.done; else doneTask" (click)="isDone(task, false)" pTooltip="Mark as undone"></i>
+        <i class="pi pi-trash pl-2 float-right text-xs font-bold cursor-pointer" (click)="delete(task)"
+          pTooltip="Delete"></i>
+      </div>
       <div class="clear-both"></div>
     </div>
   </div>
 
   <ng-template #doneTask>
     <i class="pi pi-pencil float-right text-[0.6rem] font-bold text-gray-600 cursor-pointer"
-      (click)="isDone(task.id, true)" pTooltip="Mark as done"></i>
+      (click)="isDone(task, true)" pTooltip="Mark as done"></i>
   </ng-template>
 
   <ng-template #todayTags>

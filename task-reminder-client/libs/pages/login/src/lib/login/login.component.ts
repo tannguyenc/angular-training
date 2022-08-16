@@ -56,8 +56,6 @@ export class LoginComponent implements OnDestroy, OnInit, AfterViewInit {
       https://www.googleapis.com/auth/tasks.readonly',
       ux_mode: 'popup',
       callback: (resp: IUserGoogle) => {
-        console.log('code');
-        console.log(resp);
         if (resp) {
           this.store.dispatch(UserActions.loginWithGoogle({ email: this.user.email, fullname: this.user.name, photoUrl: this.user.picture, accessToken: resp.code }));
         }
@@ -85,12 +83,9 @@ export class LoginComponent implements OnDestroy, OnInit, AfterViewInit {
     if (this.user) {
       this.store.dispatch(UserActions.checkCallOAuthGoogle({ email: this.user.email }));
       this.store.select(UserSelectors.checkCallToken).subscribe(hasCallToken => {
-        console.log(hasCallToken);
         if (!hasCallToken) {
           this.googleClient.requestCode();
         } else {
-          console.log('home');
-          console.log(this.router);
           this.store.dispatch(UserActions.loginWithGoogle({ email: this.user.email, fullname: this.user.name, photoUrl: this.user.picture, accessToken: '' }));
         }
       });

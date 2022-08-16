@@ -1,4 +1,4 @@
-import { ITaskReminderDetail } from './../../../../../datas/task-reminder';
+import { IGoogleCalendarTaskListItem, ITaskReminderDetail } from './../../../../../datas/task-reminder';
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { createReducer, on, Action } from '@ngrx/store';
 
@@ -11,6 +11,8 @@ export interface State extends EntityState<ITaskReminderDetail> {
   loaded: boolean; // has the State list been loaded
   error?: string | null; // last known error (if any)
   isSuccess: boolean;
+  googleTaskLists: IGoogleCalendarTaskListItem[];
+  loadedUpdateOrAdd: boolean;
 }
 
 export interface StatePartialState {
@@ -23,7 +25,9 @@ export const stateAdapter: EntityAdapter<ITaskReminderDetail> =
 export const initialState: State = stateAdapter.getInitialState({
   // set initial required properties
   loaded: false,
-  isSuccess: false
+  loadedUpdateOrAdd: false,
+  isSuccess: false,
+  googleTaskLists: []
 });
 
 const stateReducer = createReducer(
@@ -31,22 +35,33 @@ const stateReducer = createReducer(
   on(StateActions.init,
     StateActions.allTask,
     StateActions.updateDoneTask,
-    StateActions.AddTask,
-    StateActions.UpdateTask,
-     (state) => ({ ...state, loaded: false, isSuccess: false, error: null })),
+    StateActions.addTask,
+    StateActions.updateTask,
+    StateActions.deleteTask,
+    (state) => ({ ...state, loaded: false, isSuccess: false, error: null })),
+  on(StateActions.googleTaskList,
+    StateActions.taskDetail,
+    (state) => ({ ...state, loadedUpdateOrAdd: false, isSuccess: false, error: null })),
   on(StateActions.loadStateFailure,
     StateActions.allTaskFailure,
     StateActions.updateDoneTaskFailure,
-    StateActions.AddTaskFailure,
-    StateActions.UpdateTaskFailure,
-    (state, { error }) => ({ ...state, error, loaded: true, isSuccess: false })),
+    StateActions.addTaskFailure,
+    StateActions.updateTaskFailure,
+    StateActions.googleTaskListFailure,
+    StateActions.deleteTaskFailure,
+    (state, { error }) => ({ ...state, error, loaded: true, loadedUpdateOrAdd: true, isSuccess: false })),
   on(StateActions.allTaskSuccess,
     (state, { tasks }) => stateAdapter.setAll(tasks, { ...state, loaded: true, isSuccess: false })),
-  on(StateActions.UpdateTaskSuccess,
+  on(StateActions.googleTaskListSuccess,
+    (state, { googleTaskLists }) => ({ ...state, googleTaskLists, loadedUpdateOrAdd: true, isSuccess: false })),
+  on(StateActions.updateTaskSuccess,
+    StateActions.taskDetailSuccess,
     (state, { task }) => stateAdapter.updateOne({ id: task.id, changes: task }, { ...state, loaded: true, isSuccess: true })),
   on(StateActions.updateDoneTaskSuccess,
     (state, { task }) => stateAdapter.removeOne(task.id, { ...state, loaded: true, isSuccess: true })),
-  on(StateActions.AddTaskSuccess,
+  on(StateActions.deleteTaskSuccess,
+    (state, { task }) => stateAdapter.removeOne(task.id, { ...state, loaded: true, isSuccess: true })),
+  on(StateActions.addTaskSuccess,
     (state, { task }) => stateAdapter.addOne(task, { ...state, loaded: true, isSuccess: true })),
   on(StateActions.IsSuccessTaskSuccess,
     (state, { isSuccess }) => ({ ...state, loaded: true, isSuccess: isSuccess })),

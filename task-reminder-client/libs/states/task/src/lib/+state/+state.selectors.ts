@@ -11,6 +11,11 @@ export const getStateLoaded = createSelector(
   (state: State) => state.loaded
 );
 
+export const getStateLoadedUpdateOrAdd = createSelector(
+  getStateState,
+  (state: State) => state.loadedUpdateOrAdd
+);
+
 export const getStateIsSuccess = createSelector(
   getStateState,
   (state: State) => state.isSuccess
@@ -58,4 +63,9 @@ export const getSelected = createSelector(
   getStateEntities,
   getSelectedId,
   (entities, selectedId) => (selectedId ? entities[selectedId] : undefined)
+);
+
+export const getGoogleTaskList = createSelector(
+  getStateState,
+  (state: State) => state.googleTaskLists
 );

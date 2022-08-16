@@ -13,14 +13,14 @@ namespace TaskReminderAPI.Models
 
     public class TaskReminderResponse
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public DateTime Created { get; set; }
         public DateTime? DueDate { get; set; }
         public bool Done { get; set; }
         public bool Deleted { get; set; }
-
+        public string GoogleTaskListId { get; set; }
         public bool IsGoogleTask { get; set; }
 
         public int? CreatedUserId { get; set; }
@@ -32,24 +32,27 @@ namespace TaskReminderAPI.Models
         public int UserId { get; set; }
     }
 
+    public class GetTaskReminderDetailRequest
+    {
+        public int UserId { get; set; }
+        public string? GoogleTaskListId { get; set; }
+        public bool IsGoogleTask { get; set; }
+
+    }
     public class TaskReminderRequest
     {
         public TaskReminderStatus status { get; set; }
     }
 
-    public class AddTaskReminderRequest
+    public class AddOrUpdateTaskReminderRequest
     {
+        public string Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public DateTime DueDate { get; set; }
         public int UserId { get; set; }
-    }
-
-    public class UpdateTaskReminderRequest
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public DateTime DueDate { get; set; }
+        public string GoogleTaskListId { get; set; }
+        public bool IsGoogleTask { get; set; }
+        public bool IsDone { get; set; }
     }
 }
