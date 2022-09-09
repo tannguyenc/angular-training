@@ -1,8 +1,12 @@
 <form class="needs-validation" [formGroup]="taskForm" (ngSubmit)="onSubmit()">
   <div *ngIf="(loading$ | async) === true">
-    <div class="field mt-2">
-      <p-checkbox formControlName="isGoogleTask" [binary]="true" inputId="isGoogleTask"></p-checkbox>
+    <div class="field">
+      <p-checkbox formControlName="isGoogleTask" [binary]="true" inputId="isGoogleTask" (onChange)="onChangeIsGoogleTask($event)"></p-checkbox>
       <label for="isGoogleTask"> Create for google task</label>
+      <small class="p-error block">Due Time isn't support the time that a google task.
+      </small>
+      <small *ngIf="errorTaskList" class="p-error block">Please choose a task list when creating a google task.
+      </small>
     </div>
     <div class="field mt-2">
       <label for="description" class="block">Task List</label>
@@ -26,7 +30,7 @@
           [showIcon]="true" appendTo="body">
         </p-calendar>
       </div>
-      <div>
+      <div *ngIf="showDueTime">
         <label class="required block" for="dueTime">Due Time</label>
         <p-calendar inputId="dueTime" formControlName="dueTime" [timeOnly]="true"></p-calendar>
       </div>

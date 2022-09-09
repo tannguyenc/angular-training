@@ -28,6 +28,8 @@ export class AddOrUpdateTaskComponent implements OnInit {
 
   minimumDate = new Date();
   taskForm: FormGroup;
+  showDueTime = true;
+  errorTaskList = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -56,6 +58,8 @@ export class AddOrUpdateTaskComponent implements OnInit {
       // });
       this.taskForm.controls['isGoogleTask'].disable();
       this.taskForm.controls['googleTaskListId'].disable();
+      if (currentTask.isGoogleTask)
+        this.showDueTime = false;
       this.taskForm.patchValue(currentTask);
     }
   }
@@ -76,8 +80,11 @@ export class AddOrUpdateTaskComponent implements OnInit {
     const isGoogleTask = this.taskForm.controls['isGoogleTask'].value;
     const googleTaskListId = this.taskForm.controls['googleTaskListId'].value;
     if (isGoogleTask === true && googleTaskListId === '') {
+      this.errorTaskList = true;
       return;
     }
+
+    this.errorTaskList = false;
 
     const dueDate = this.taskForm.controls['dueDate'].value;
     const dueTime = this.taskForm.controls['dueTime'].value;
@@ -101,6 +108,7 @@ export class AddOrUpdateTaskComponent implements OnInit {
     } else {
       this.store.dispatch(StateActions.addTask({ task: form }));
     }
+
     this.ref.close();
   }
 
@@ -111,5 +119,13 @@ export class AddOrUpdateTaskComponent implements OnInit {
       return +userIdLocal;
     }
     return userId;
+  }
+
+  onChangeIsGoogleTask(event: any) {
+    if (event.checked) {
+      this.showDueTime = false;
+    } else {
+      this.showDueTime = true;
+    }
   }
 }
