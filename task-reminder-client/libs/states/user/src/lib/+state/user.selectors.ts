@@ -42,5 +42,5 @@ export const getToken = createSelector(
 
 export const checkCallToken = createSelector(
   getUserState,
-  (state: State) => state?.isCallToken ?? false
+  (state: State) => state?.isCallToken ?? 0
 );

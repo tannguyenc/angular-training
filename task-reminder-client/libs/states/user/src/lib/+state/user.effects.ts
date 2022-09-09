@@ -38,6 +38,7 @@ export class UserEffects {
           localStorage.setItem('token', resp.token);
           localStorage.setItem('userId', resp.id);
           localStorage.setItem('photoUrl', resp.photoUrl);
+          localStorage.setItem('fullname', fullname);
           this.router.navigate(['home']);
         }),
         map(resp => UserActions.loginWithGoogleSuccess({ token: resp.token })),
@@ -49,11 +50,12 @@ export class UserEffects {
     )
   );
 
+  //0: init, 1: true, 2: false
   checkCallOAuthGoogle$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserActions.checkCallOAuthGoogle),
       exhaustMap(({ email }) => this.userService.checkCallOAuthGoogle(email).pipe(
-        map(resp => UserActions.checkCallOAuthGoogleSuccess({ isCallToken: resp })),
+        map(resp => UserActions.checkCallOAuthGoogleSuccess({ isCallToken: resp ? 1 : 2 })),
         catchError((error: HttpErrorResponse) => {
           this.messageService.add({ severity: 'error', summary: 'Login failed', detail: error.error });
           return of(UserActions.checkCallOAuthGoogleFailure({ error }))

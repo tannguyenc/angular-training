@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, Pipe } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -57,6 +57,7 @@ export class LoginComponent implements OnDestroy, OnInit, AfterViewInit {
       ux_mode: 'popup',
       callback: (resp: IUserGoogle) => {
         if (resp) {
+          console.log(resp.code);
           this.store.dispatch(UserActions.loginWithGoogle({ email: this.user.email, fullname: this.user.name, photoUrl: this.user.picture, accessToken: resp.code }));
         }
       },
@@ -83,9 +84,10 @@ export class LoginComponent implements OnDestroy, OnInit, AfterViewInit {
     if (this.user) {
       this.store.dispatch(UserActions.checkCallOAuthGoogle({ email: this.user.email }));
       this.store.select(UserSelectors.checkCallToken).subscribe(hasCallToken => {
-        if (!hasCallToken) {
+        console.log(hasCallToken);
+        if (hasCallToken === 2) {
           this.googleClient.requestCode();
-        } else {
+        } else if (hasCallToken === 1) {
           this.store.dispatch(UserActions.loginWithGoogle({ email: this.user.email, fullname: this.user.name, photoUrl: this.user.picture, accessToken: '' }));
         }
       });

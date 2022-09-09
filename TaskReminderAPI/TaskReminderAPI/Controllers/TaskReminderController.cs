@@ -412,7 +412,7 @@ namespace TaskReminderAPI.Controllers
 
                             if (tasks != null && tasks.items.Any())
                             {
-                                results = tasks.items.Select(x => new TaskReminderResponse
+                                results.AddRange(tasks.items.Select(x => new TaskReminderResponse
                                 {
                                     Created = x.updated,
                                     Deleted = false,
@@ -424,7 +424,7 @@ namespace TaskReminderAPI.Controllers
                                     Id = x.id,
                                     IsGoogleTask = true,
                                     GoogleTaskListId = taskList.id,
-                                }).ToList();
+                                }).ToList());
                             }
                         }
                     }
