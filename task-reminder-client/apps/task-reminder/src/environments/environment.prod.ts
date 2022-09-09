@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  api: 'https://wstaskreminderapi.xyz/',
+  api: 'https://www.wstaskreminder.xyz/',
 };

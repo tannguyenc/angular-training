@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -13,8 +14,13 @@ namespace TaskReminderAPI.Controllers
     public class TaskReminderController : ControllerBase
     {
         private readonly TaskReminderDbContext _context;
+        private readonly GlobalAppSetting.APIOption _aPISetting;
 
-        public TaskReminderController(TaskReminderDbContext context) => _context = context;
+        public TaskReminderController(TaskReminderDbContext context, IOptions<GlobalAppSetting.APIOption> aPISetting)
+        {
+            _context = context;
+            _aPISetting = aPISetting.Value;
+        }
 
         [HttpGet]
         public async Task<List<TaskReminderDetailModel>> Get([FromQuery] GetTaskReminderRequest request)
@@ -324,7 +330,7 @@ namespace TaskReminderAPI.Controllers
                 var events = new GoogleCalendarEvents();
                 //set request
                 var request = new HttpRequestMessage(HttpMethod.Get, "https://www.googleapis.com/calendar/v3/calendars/primary/events?maxResults=10" +
-                    "&orderBy=startTime&singleEvents=true&timeMin=2022-08-05T04:52:05.504Z&key=AIzaSyCNGPlz9EvS0yU2BdT_3pLpTm58zDc0Vec");
+                    $"&orderBy=startTime&singleEvents=true&timeMin=2022-08-05T04:52:05.504Z&key={_aPISetting.APIKey}");
                 //set Header
                 request.Headers.Authorization = new AuthenticationHeaderValue(
                     "Bearer", user.AccessTokenGoogle);
@@ -394,7 +400,7 @@ namespace TaskReminderAPI.Controllers
                             var tasks = new GoogleCalendarTasks();
                             //set request
                             var request = new HttpRequestMessage(HttpMethod.Get, $"https://tasks.googleapis.com/tasks/v1/lists/{taskList.id}/tasks" +
-                                "?maxResults=50&showCompleted=true&showHidden=true&key=AIzaSyCNGPlz9EvS0yU2BdT_3pLpTm58zDc0Vec");
+                                $"?maxResults=50&showCompleted=true&showHidden=true&key={_aPISetting.APIKey}");
 
                             //set Header
                             request.Headers.Authorization = new AuthenticationHeaderValue(
@@ -450,7 +456,7 @@ namespace TaskReminderAPI.Controllers
                 {
                     var taskList = new GoogleCalendarTaskList();
                     //set request
-                    var request = new HttpRequestMessage(HttpMethod.Get, "https://tasks.googleapis.com/tasks/v1/users/@me/lists?key=AIzaSyCNGPlz9EvS0yU2BdT_3pLpTm58zDc0Vec");
+                    var request = new HttpRequestMessage(HttpMethod.Get, $"https://tasks.googleapis.com/tasks/v1/users/@me/lists?key={_aPISetting.APIKey}");
                     //set Header
                     request.Headers.Authorization = new AuthenticationHeaderValue(
                         "Bearer", accessTokenGoogle);
@@ -500,10 +506,10 @@ namespace TaskReminderAPI.Controllers
                         var json = JsonConvert.SerializeObject(new
                         {
                             refresh_token = refreshToken,
-                            client_id = "563919799549-l37pui6624jnr4j39n20aqvg83jvk54b.apps.googleusercontent.com",
-                            client_secret = "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",
+                            client_id = _aPISetting.ClientId,
+                            client_secret = _aPISetting.ClientSecret,
                             grant_type = "refresh_token",
-                            redirect_uri = "http://localhost:4200"
+                            redirect_uri = _aPISetting.UrlSite
                         });
                         request.Content = new StringContent(json);
                         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
@@ -546,7 +552,7 @@ namespace TaskReminderAPI.Controllers
                 {
                     //set request
                     var request = new HttpRequestMessage(HttpMethod.Post, $"https://tasks.googleapis.com/tasks/v1/lists/" +
-                        $"{task.GoogleTaskListId}/tasks?key=AIzaSyCNGPlz9EvS0yU2BdT_3pLpTm58zDc0Vec");
+                        $"{task.GoogleTaskListId}/tasks?key={_aPISetting.APIKey}");
                     //set Header
                     request.Headers.Authorization = new AuthenticationHeaderValue(
                         "Bearer", accessTokenGoogle);
@@ -618,7 +624,7 @@ namespace TaskReminderAPI.Controllers
                 {
                     //set request
                     var request = new HttpRequestMessage(HttpMethod.Put, $"https://tasks.googleapis.com/tasks/v1/lists/" +
-                        $"{task.GoogleTaskListId}/tasks/{task.Id}?key=AIzaSyCNGPlz9EvS0yU2BdT_3pLpTm58zDc0Vec");
+                        $"{task.GoogleTaskListId}/tasks/{task.Id}?key={_aPISetting.APIKey}");
                     //set Header
                     request.Headers.Authorization = new AuthenticationHeaderValue(
                         "Bearer", accessTokenGoogle);
@@ -691,7 +697,7 @@ namespace TaskReminderAPI.Controllers
                 {
                     //set request
                     var request = new HttpRequestMessage(HttpMethod.Get, $"https://tasks.googleapis.com/tasks/v1/lists/" +
-                        $"{taskList}/tasks/{id}?key=AIzaSyCNGPlz9EvS0yU2BdT_3pLpTm58zDc0Vec");
+                        $"{taskList}/tasks/{id}?key={_aPISetting.APIKey}");
                     //set Header
                     request.Headers.Authorization = new AuthenticationHeaderValue(
                         "Bearer", accessTokenGoogle);
@@ -750,7 +756,7 @@ namespace TaskReminderAPI.Controllers
                 {
                     //set request
                     var request = new HttpRequestMessage(HttpMethod.Delete, $"https://tasks.googleapis.com/tasks/v1/lists/" +
-                        $"{taskList}/tasks/{id}?key=AIzaSyCNGPlz9EvS0yU2BdT_3pLpTm58zDc0Vec");
+                        $"{taskList}/tasks/{id}?key={_aPISetting.APIKey}");
                     //set Header
                     request.Headers.Authorization = new AuthenticationHeaderValue(
                         "Bearer", accessTokenGoogle);
