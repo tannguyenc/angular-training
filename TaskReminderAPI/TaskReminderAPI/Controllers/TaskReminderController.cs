@@ -90,8 +90,6 @@ namespace TaskReminderAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(TaskReminder), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(string id, [FromQuery] GetTaskReminderDetailRequest request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId);
@@ -127,8 +125,6 @@ namespace TaskReminderAPI.Controllers
         }
 
         [HttpGet("search/{name}")]
-        [ProducesResponseType(typeof(TaskReminder), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByTitle(string name)
         {
             var taskReminder = await _context.TaskReminders.FirstOrDefaultAsync(c => c.Name == name && !c.Deleted);
@@ -136,7 +132,6 @@ namespace TaskReminderAPI.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> Create([FromBody] AddOrUpdateTaskReminderRequest task)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == task.UserId);
@@ -183,8 +178,6 @@ namespace TaskReminderAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(string id, [FromBody] AddOrUpdateTaskReminderRequest task)
         {
             if (id != task.Id) return BadRequest();
@@ -231,8 +224,6 @@ namespace TaskReminderAPI.Controllers
         }
 
         [HttpPut("{id}/done")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateDoneStatus(string id, [FromBody] AddOrUpdateTaskReminderRequest task)
         {
             if (id != task.Id) return BadRequest();
@@ -276,8 +267,6 @@ namespace TaskReminderAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string id, [FromQuery] GetTaskReminderDetailRequest request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId);

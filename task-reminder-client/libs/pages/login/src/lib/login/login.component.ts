@@ -14,7 +14,7 @@ declare let google: any;
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnDestroy, OnInit, AfterViewInit {
+export class LoginComponent implements OnDestroy, AfterViewInit {
 
   loginForm = this.fb.group({
     email: ['', Validators.required],
@@ -36,19 +36,6 @@ export class LoginComponent implements OnDestroy, OnInit, AfterViewInit {
 
   }
 
-  ngOnInit(): void {
-    // this.socialAuthService.authState.subscribe((user: SocialUser) => {
-    //   if (user) {
-    //     this.socialAuthService.getAccessToken(GoogleLoginProvider.PROVIDER_ID)
-    //       .then((accessToken: string) => {
-    //         if (accessToken) {
-    //           this.store.dispatch(UserActions.loginWithGoogle({ email: user.email, fullname: user.name, photoUrl: user.photoUrl, accessToken: accessToken }));
-    //         }
-    //       });
-    //   }
-    // });
-  }
-
   ngAfterViewInit(): void {
     this.googleClient = google.accounts.oauth2.initCodeClient({
       client_id: '563919799549-l37pui6624jnr4j39n20aqvg83jvk54b.apps.googleusercontent.com',
@@ -57,7 +44,6 @@ export class LoginComponent implements OnDestroy, OnInit, AfterViewInit {
       ux_mode: 'popup',
       callback: (resp: IUserGoogle) => {
         if (resp) {
-          console.log(resp.code);
           this.store.dispatch(UserActions.loginWithGoogle({ email: this.user.email, fullname: this.user.name, photoUrl: this.user.picture, accessToken: resp.code }));
         }
       },
@@ -84,7 +70,6 @@ export class LoginComponent implements OnDestroy, OnInit, AfterViewInit {
     if (this.user) {
       this.store.dispatch(UserActions.checkCallOAuthGoogle({ email: this.user.email }));
       this.store.select(UserSelectors.checkCallToken).subscribe(hasCallToken => {
-        console.log(hasCallToken);
         if (hasCallToken === 2) {
           this.googleClient.requestCode();
         } else if (hasCallToken === 1) {

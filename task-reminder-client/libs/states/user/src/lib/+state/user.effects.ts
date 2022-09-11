@@ -19,6 +19,7 @@ export class UserEffects {
           localStorage.setItem('token', resp.token);
           localStorage.setItem('userId', resp.id);
           localStorage.setItem('photoUrl', resp.photoUrl);
+          localStorage.setItem('fullname', resp.fullName);
           this.router.navigate(['home']);
         }),
         map(resp => UserActions.loginSuccess({ token: resp.token })),
@@ -38,7 +39,7 @@ export class UserEffects {
           localStorage.setItem('token', resp.token);
           localStorage.setItem('userId', resp.id);
           localStorage.setItem('photoUrl', resp.photoUrl);
-          localStorage.setItem('fullname', fullname);
+          localStorage.setItem('fullname', resp.fullName);
           this.router.navigate(['home']);
         }),
         map(resp => UserActions.loginWithGoogleSuccess({ token: resp.token })),

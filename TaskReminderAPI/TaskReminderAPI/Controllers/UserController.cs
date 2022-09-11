@@ -146,8 +146,6 @@ namespace TaskReminderAPI.Controllers
             => await _context.Users.Where(x => !x.Deleted).ToListAsync();
 
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id && !x.Deleted);
@@ -155,8 +153,6 @@ namespace TaskReminderAPI.Controllers
         }
 
         [HttpGet("search/{email}")]
-        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByTitle(string email)
         {
             var user = await _context.Users.FirstOrDefaultAsync(c => c.Email == email && !c.Deleted);
@@ -164,8 +160,6 @@ namespace TaskReminderAPI.Controllers
         }
 
         [HttpGet("checkCallOAuthGoogle/{email}")]
-        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> CheckExistUserEmailAndRefreshTokenGoogle(string email)
         {
             var user = await _context.Users.FirstOrDefaultAsync(c => c.Email == email && !string.IsNullOrEmpty(c.RefreshTokenGoogle) && !c.Deleted);
@@ -189,8 +183,6 @@ namespace TaskReminderAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(int id, User user)
         {
             if (id != user.Id) return BadRequest();
@@ -202,8 +194,6 @@ namespace TaskReminderAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
             var userToDelete = await _context.Users.FindAsync(id);
@@ -213,6 +203,24 @@ namespace TaskReminderAPI.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpGet("accesstoken/{id}")]
+        public async Task<IActionResult> GetAccessToken(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return NotFound();
+
+            var newToken = await GoogleAccessTokenFromRefreshToken(user.RefreshTokenGoogle);
+            if (newToken != null && !string.IsNullOrEmpty(newToken.access_token) && newToken.expires_in > 0)
+            {
+                user.ExpiresInGoogle = DateTime.Now.AddSeconds(newToken.expires_in);
+                user.AccessTokenGoogle = newToken.access_token;
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok(newToken);
         }
 
         private async Task<GoogleAuthorizationCode> GoogleAuthorizationCode(string code)
@@ -292,6 +300,8 @@ namespace TaskReminderAPI.Controllers
                             // Get the response
                             var customerJsonString = await response.Content.ReadAsStringAsync();
 
+                            result.message = customerJsonString;
+
                             // Deserialise the data (include the Newtonsoft JSON Nuget package if you don't already have it)
                             var deserialized = JsonConvert.DeserializeObject<GoogleAuthorizationCode>(custome‌​rJsonString);
                             if (deserialized != null && !string.IsNullOrEmpty(deserialized.access_token))
@@ -300,12 +310,15 @@ namespace TaskReminderAPI.Controllers
                                 result.refresh_token = refreshToken;
                             }
                         }
+
+                        result.message += $"/nResponse: {JsonConvert.SerializeObject(response)}";
                     }
                 }
             }
             catch (Exception ex)
             {
                 result = new GoogleAuthorizationCode();
+                result.message += $"/nError: {ex.Message}";
             }
 
             return result;

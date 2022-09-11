@@ -14,6 +14,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<TaskReminderDbContext>(
     o => o.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
 
+builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
+{
+    build.WithOrigins("*").AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin();
+}));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -21,11 +26,8 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-//app.UseHttpsRedirection();
-app.UseCors(x => x
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
+app.UseHttpsRedirection();
+app.UseCors("corspolicy");
 
 app.UseAuthorization();
 
