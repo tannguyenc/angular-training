@@ -1,5 +1,5 @@
 import { UserService } from '@task-reminder-client/services/user';
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
 import { catchError, exhaustMap, map, tap, of } from 'rxjs';
 
@@ -36,11 +36,15 @@ export class UserEffects {
       ofType(UserActions.loginWithGoogle),
       exhaustMap(({ email, fullname, photoUrl, accessToken }) => this.userService.authenticateWithGoogle(email, fullname, photoUrl, accessToken).pipe(
         tap((resp) => {
-          localStorage.setItem('token', resp.token);
-          localStorage.setItem('userId', resp.id);
-          localStorage.setItem('photoUrl', resp.photoUrl);
-          localStorage.setItem('fullname', resp.fullName);
-          this.router.navigate(['home']);
+          this.zone.run(() => {
+            if (resp.token) {
+              localStorage.setItem('token', resp.token);
+              localStorage.setItem('userId', resp.id);
+              localStorage.setItem('photoUrl', resp.photoUrl);
+              localStorage.setItem('fullname', resp.fullName);
+              this.router.navigate(['home']);
+            }
+          });
         }),
         map(resp => UserActions.loginWithGoogleSuccess({ token: resp.token })),
         catchError((error: HttpErrorResponse) => {
@@ -68,5 +72,6 @@ export class UserEffects {
   constructor(private readonly actions$: Actions,
     private userService: UserService,
     private router: Router,
+    private zone: NgZone,
     private messageService: MessageService) { }
 }
