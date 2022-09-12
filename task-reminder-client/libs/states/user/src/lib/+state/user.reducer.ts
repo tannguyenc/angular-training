@@ -12,7 +12,7 @@ export interface State extends EntityState<UserEntity> {
   loaded: boolean; // has the User list been loaded
   error?: HttpErrorResponse | null; // last known error (if any)
   token: string;
-  isCallToken: boolean;
+  isCallToken: number;
 }
 
 export interface UserPartialState {
@@ -26,7 +26,7 @@ export const initialState: State = userAdapter.getInitialState({
   // set initial required properties
   loaded: false,
   token: '',
-  isCallToken: true
+  isCallToken: 0
 });
 
 const userReducer = createReducer(
@@ -34,7 +34,7 @@ const userReducer = createReducer(
   on(UserActions.login,
     UserActions.loginWithGoogle,
     UserActions.checkCallOAuthGoogle,
-    (state) => ({ ...state, loaded: false, isCallToken: true, error: null })
+    (state) => ({ ...state, loaded: false, isCallToken: 0, error: null })
   ),
   on(UserActions.loginSuccess,
     UserActions.loginWithGoogleSuccess,
@@ -50,7 +50,9 @@ const userReducer = createReducer(
   on(UserActions.loginFailure,
     UserActions.loginWithGoogleFailure,
     UserActions.checkCallOAuthGoogleFailure,
-    (state, { error }) => ({ ...state, error, loaded: true }))
+    (state, { error }) => ({ ...state, error, loaded: true })),
+    on(UserActions.SetCallTokenFalse,
+      (state, { callToken }) => ({ ...state, loaded: true, isCallToken: 0 })),
 );
 
 export function reducer(state: State | undefined, action: Action) {

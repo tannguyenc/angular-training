@@ -38,10 +38,15 @@ export const checkCallOAuthGoogle = createAction(
 
 export const checkCallOAuthGoogleSuccess = createAction(
   '[User/API] Check Call OAuth Google success',
-  props<{ isCallToken: boolean }>()
+  props<{ isCallToken: number }>()
 );
 
 export const checkCallOAuthGoogleFailure = createAction(
   '[User/API] Check Call OAuth Google failure',
   props<{ error: HttpErrorResponse }>()
+);
+
+export const SetCallTokenFalse = createAction(
+  '[User/API] Set Call Token False',
+  props<{ callToken: number }>()
 );

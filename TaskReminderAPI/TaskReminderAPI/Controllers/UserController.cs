@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,11 +17,13 @@ namespace TaskReminderAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly TaskReminderDbContext _context;
+        private readonly GlobalAppSetting.APIOption _aPISetting;
 
         public UserController(
-            TaskReminderDbContext context)
+            TaskReminderDbContext context, IOptions<GlobalAppSetting.APIOption> aPISetting)
         {
             _context = context;
+            _aPISetting = aPISetting.Value;
         }
 
         [HttpPost("authorize")]
@@ -143,8 +146,6 @@ namespace TaskReminderAPI.Controllers
             => await _context.Users.Where(x => !x.Deleted).ToListAsync();
 
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id && !x.Deleted);
@@ -152,8 +153,6 @@ namespace TaskReminderAPI.Controllers
         }
 
         [HttpGet("search/{email}")]
-        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByTitle(string email)
         {
             var user = await _context.Users.FirstOrDefaultAsync(c => c.Email == email && !c.Deleted);
@@ -161,11 +160,11 @@ namespace TaskReminderAPI.Controllers
         }
 
         [HttpGet("checkCallOAuthGoogle/{email}")]
-        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> CheckExistUserEmailAndRefreshTokenGoogle(string email)
         {
             var user = await _context.Users.FirstOrDefaultAsync(c => c.Email == email && !string.IsNullOrEmpty(c.RefreshTokenGoogle) && !c.Deleted);
+            //if (user == null) return Ok(false);
+            //if(user.ExpiresInGoogle )
             return user == null ? Ok(false) : Ok(true);
         }
 
@@ -184,8 +183,6 @@ namespace TaskReminderAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(int id, User user)
         {
             if (id != user.Id) return BadRequest();
@@ -197,8 +194,6 @@ namespace TaskReminderAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
             var userToDelete = await _context.Users.FindAsync(id);
@@ -208,6 +203,24 @@ namespace TaskReminderAPI.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpGet("accesstoken/{id}")]
+        public async Task<IActionResult> GetAccessToken(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return NotFound();
+
+            var newToken = await GoogleAccessTokenFromRefreshToken(user.RefreshTokenGoogle);
+            if (newToken != null && !string.IsNullOrEmpty(newToken.access_token) && newToken.expires_in > 0)
+            {
+                user.ExpiresInGoogle = DateTime.Now.AddSeconds(newToken.expires_in);
+                user.AccessTokenGoogle = newToken.access_token;
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok(newToken);
         }
 
         private async Task<GoogleAuthorizationCode> GoogleAuthorizationCode(string code)
@@ -223,10 +236,10 @@ namespace TaskReminderAPI.Controllers
                         var json = JsonConvert.SerializeObject(new
                         {
                             code = code,
-                            client_id = "563919799549-l37pui6624jnr4j39n20aqvg83jvk54b.apps.googleusercontent.com",
-                            client_secret = "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",
+                            client_id = _aPISetting.ClientId,
+                            client_secret = _aPISetting.ClientSecret,
                             grant_type = "authorization_code",
-                            redirect_uri = "http://localhost:4200"
+                            redirect_uri = _aPISetting.UrlSite
                         });
                         request.Content = new StringContent(json);
                         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
@@ -272,10 +285,10 @@ namespace TaskReminderAPI.Controllers
                         var json = JsonConvert.SerializeObject(new
                         {
                             refresh_token = refreshToken,
-                            client_id = "563919799549-l37pui6624jnr4j39n20aqvg83jvk54b.apps.googleusercontent.com",
-                            client_secret = "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",
+                            client_id = _aPISetting.ClientId,
+                            client_secret = _aPISetting.ClientSecret,
                             grant_type = "refresh_token",
-                            redirect_uri = "http://localhost:4200"
+                            redirect_uri = _aPISetting.UrlSite
                         });
                         request.Content = new StringContent(json);
                         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
@@ -287,6 +300,8 @@ namespace TaskReminderAPI.Controllers
                             // Get the response
                             var customerJsonString = await response.Content.ReadAsStringAsync();
 
+                            result.message = customerJsonString;
+
                             // Deserialise the data (include the Newtonsoft JSON Nuget package if you don't already have it)
                             var deserialized = JsonConvert.DeserializeObject<GoogleAuthorizationCode>(custome‌​rJsonString);
                             if (deserialized != null && !string.IsNullOrEmpty(deserialized.access_token))
@@ -295,12 +310,15 @@ namespace TaskReminderAPI.Controllers
                                 result.refresh_token = refreshToken;
                             }
                         }
+
+                        result.message += $"/nResponse: {JsonConvert.SerializeObject(response)}";
                     }
                 }
             }
             catch (Exception ex)
             {
                 result = new GoogleAuthorizationCode();
+                result.message += $"/nError: {ex.Message}";
             }
 
             return result;

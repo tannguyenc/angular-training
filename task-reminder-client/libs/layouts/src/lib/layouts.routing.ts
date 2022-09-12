@@ -3,8 +3,10 @@ import { Routes, RouterModule } from '@angular/router';
 import { MainComponent } from './main/main.component';
 
 const routes: Routes = [
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
     path: '',
+    canActivate: [AuthGuardService],
     component: MainComponent,
     children: [
       {
@@ -16,7 +18,7 @@ const routes: Routes = [
         path: 'detail',
         canActivate: [AuthGuardService],
         loadChildren: () => import("@task-reminder-client/pages/detail").then(m => m.PagesDetailModule)
-      }
+      },
     ]
   },
 ];

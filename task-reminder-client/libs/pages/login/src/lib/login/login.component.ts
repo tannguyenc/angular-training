@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, Pipe } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -14,7 +14,7 @@ declare let google: any;
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnDestroy, OnInit, AfterViewInit {
+export class LoginComponent implements OnDestroy, AfterViewInit {
 
   loginForm = this.fb.group({
     email: ['', Validators.required],
@@ -34,19 +34,6 @@ export class LoginComponent implements OnDestroy, OnInit, AfterViewInit {
     private store: Store,
   ) {
 
-  }
-
-  ngOnInit(): void {
-    // this.socialAuthService.authState.subscribe((user: SocialUser) => {
-    //   if (user) {
-    //     this.socialAuthService.getAccessToken(GoogleLoginProvider.PROVIDER_ID)
-    //       .then((accessToken: string) => {
-    //         if (accessToken) {
-    //           this.store.dispatch(UserActions.loginWithGoogle({ email: user.email, fullname: user.name, photoUrl: user.photoUrl, accessToken: accessToken }));
-    //         }
-    //       });
-    //   }
-    // });
   }
 
   ngAfterViewInit(): void {
@@ -83,9 +70,9 @@ export class LoginComponent implements OnDestroy, OnInit, AfterViewInit {
     if (this.user) {
       this.store.dispatch(UserActions.checkCallOAuthGoogle({ email: this.user.email }));
       this.store.select(UserSelectors.checkCallToken).subscribe(hasCallToken => {
-        if (!hasCallToken) {
+        if (hasCallToken === 2) {
           this.googleClient.requestCode();
-        } else {
+        } else if (hasCallToken === 1) {
           this.store.dispatch(UserActions.loginWithGoogle({ email: this.user.email, fullname: this.user.name, photoUrl: this.user.picture, accessToken: '' }));
         }
       });
